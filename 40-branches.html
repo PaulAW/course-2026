@@ -173,7 +173,7 @@ document.getElementById('pwd').addEventListener('keydown', function(e) {
 </div>
 
 <script>
-const TIMES = [0.0, 19.059, 37.975, 56.986, 76.718, 120.943, 172.512, 209.466, 251.555, 301.036, 369.742, 393.529, 415.3, 442.904, 464.027, 489.783, 508.146, 528.502, 547.321, 564.461, 582.392, 600.564, 618.399, 637.219, 655.63, 675.194, 693.941, 712.593, 731.028, 756.615, 778.291, 801.166, 820.226, 843.269, 865.425, 887.244, 909.688, 930.091, 954.119, 975.65, 1000.278, 1025.073];
+const TIMES = [0.0, 18.435, 36.055, 53.938, 71.822, 114.991, 164.496, 201.45, 243.539, 293.02, 360.118, 383.905, 405.677, 433.28, 453.563, 478.023, 496.386, 516.742, 535.561, 552.701, 570.632, 588.804, 606.615, 625.435, 643.846, 663.41, 682.157, 700.808, 719.244, 743.151, 764.827, 787.702, 806.762, 829.805, 851.961, 873.78, 896.224, 916.627, 939.599, 959.282, 981.534, 1004.649];
 const N     = 42;
 const aud   = document.getElementById('aud');
 const idle  = document.getElementById('idle');
@@ -214,6 +214,48 @@ aud.addEventListener('timeupdate', sync);
 aud.addEventListener('seeked',     forceSync);
 aud.addEventListener('ended',      () => show(-1));
 
+// ── playback speed ──────────────────────────────────────────────────────────
+let speed = 1.0;
+const MIN_SPEED = 0.25;
+const MAX_SPEED = 3.0;
+
+function setSpeed(s) {
+  speed = Math.min(MAX_SPEED, Math.max(MIN_SPEED, Math.round(s * 100) / 100));
+  aud.playbackRate = speed;
+  showBadge(speed.toFixed(2).replace(/\.?0+$/, '') + '×');
+}
+
+// ── flash helpers ────────────────────────────────────────────────────────────
+function showBadge(text) {
+  let b = document.getElementById('_badge');
+  if (!b) {
+    b = document.createElement('div');
+    b.id = '_badge';
+    b.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'
+      + 'background:rgba(0,0,0,.72);color:#f5e6c8;font-size:1.6rem;padding:12px 28px;'
+      + 'border-radius:10px;pointer-events:none;z-index:600;font-family:Georgia,serif;'
+      + 'transition:opacity .45s;';
+    document.body.appendChild(b);
+  }
+  b.textContent = text;
+  b.style.opacity = '1';
+  clearTimeout(b._t);
+  b._t = setTimeout(() => b.style.opacity = '0', 1100);
+}
+
+function showSeekFlash(side) {
+  const el = document.createElement('div');
+  el.textContent = side === 'left' ? '◀ 10s' : '30s ▶';
+  const pos = side === 'left' ? 'left:12%' : 'right:12%';
+  el.style.cssText = 'position:fixed;top:50%;' + pos + ';transform:translateY(-50%);'
+    + 'background:rgba(0,0,0,.65);color:#f5e6c8;font-size:1.3rem;padding:10px 22px;'
+    + 'border-radius:36px;pointer-events:none;opacity:1;transition:opacity .5s;'
+    + 'z-index:600;font-family:Georgia,serif;';
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 520); }, 680);
+}
+
+// ── keyboard shortcuts ───────────────────────────────────────────────────────
 document.addEventListener('keydown', function(e) {
   if (document.getElementById('gate').style.display !== 'none') return;
   switch (e.key) {
@@ -224,11 +266,34 @@ document.addEventListener('keydown', function(e) {
     case 'ArrowRight':
       e.preventDefault();
       aud.currentTime = Math.min(aud.currentTime + 30, aud.duration || 0);
+      showSeekFlash('right');
       break;
     case 'ArrowLeft':
       e.preventDefault();
       aud.currentTime = Math.max(aud.currentTime - 10, 0);
+      showSeekFlash('left');
       break;
+    case 'f': case 'F':
+      e.preventDefault();
+      setSpeed(speed + 0.25);
+      break;
+    case 's': case 'S':
+      e.preventDefault();
+      setSpeed(speed - 0.25);
+      break;
+  }
+});
+
+// ── tap zones (left = -10 s, right = +30 s) ──────────────────────────────────
+document.getElementById('stage').addEventListener('click', function(e) {
+  if (document.getElementById('gate').style.display !== 'none') return;
+  const rect = this.getBoundingClientRect();
+  if (e.clientX < rect.left + rect.width / 2) {
+    aud.currentTime = Math.max(aud.currentTime - 10, 0);
+    showSeekFlash('left');
+  } else {
+    aud.currentTime = Math.min(aud.currentTime + 30, aud.duration || 0);
+    showSeekFlash('right');
   }
 });
 </script>
