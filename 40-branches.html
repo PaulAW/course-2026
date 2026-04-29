@@ -173,7 +173,7 @@ document.getElementById('pwd').addEventListener('keydown', function(e) {
 </div>
 
 <script>
-const TIMES = [0.0, 18.819, 37.735, 56.242, 75.302, 121.687, 175.152, 212.106, 254.219, 303.724, 372.454, 396.001, 417.772, 445.376, 466.355, 492.423, 510.786, 531.142, 549.961, 567.101, 585.032, 603.204, 621.039, 639.859, 658.27, 677.834, 696.581, 715.233, 733.668, 759.087, 780.763, 803.638, 822.698, 845.741, 867.897, 889.716, 912.16, 932.563, 955.727, 976.562, 999.99, 1023.321];
+const TIMES = [0.0, 19.059, 37.975, 56.986, 76.718, 120.943, 172.512, 209.466, 251.555, 301.036, 369.742, 393.529, 415.3, 442.904, 464.027, 489.783, 508.146, 528.502, 547.321, 564.461, 582.392, 600.564, 618.399, 637.219, 655.63, 675.194, 693.941, 712.593, 731.028, 756.615, 778.291, 801.166, 820.226, 843.269, 865.425, 887.244, 909.688, 930.091, 954.119, 975.65, 1000.278, 1025.073];
 const N     = 42;
 const aud   = document.getElementById('aud');
 const idle  = document.getElementById('idle');
@@ -213,6 +213,24 @@ function forceSync() {
 aud.addEventListener('timeupdate', sync);
 aud.addEventListener('seeked',     forceSync);
 aud.addEventListener('ended',      () => show(-1));
+
+document.addEventListener('keydown', function(e) {
+  if (document.getElementById('gate').style.display !== 'none') return;
+  switch (e.key) {
+    case ' ':
+      e.preventDefault();
+      aud.paused ? aud.play() : aud.pause();
+      break;
+    case 'ArrowRight':
+      e.preventDefault();
+      aud.currentTime = Math.min(aud.currentTime + 30, aud.duration || 0);
+      break;
+    case 'ArrowLeft':
+      e.preventDefault();
+      aud.currentTime = Math.max(aud.currentTime - 10, 0);
+      break;
+  }
+});
 </script>
 </body>
 </html>
