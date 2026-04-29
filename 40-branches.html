@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>40 Branches of the Veda</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #0d1117;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+#wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+#stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px 8px;
+  overflow: hidden;
+}
+
+/* ── slides ── */
+.slide {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+  max-width: 900px;
+  width: 100%;
+  animation: fi .5s ease;
+}
+.slide.active { display: flex; }
+@keyframes fi {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── text styles ── */
+.vedic {
+  color: #f5e6c8;                                  /* warm cream */
+  font-size: clamp(2rem, 6vw, 3.6rem);
+  font-weight: bold;
+  letter-spacing: .04em;
+  line-height: 1.2;
+}
+.quality {
+  color: #7eb8d4;                                  /* soft blue */
+  font-size: clamp(1.15rem, 3.4vw, 2.1rem);
+  font-style: italic;
+  line-height: 1.35;
+}
+.aspect {
+  color: #7dc47d;                                  /* soft green */
+  font-size: clamp(.92rem, 2.5vw, 1.35rem);
+  line-height: 1.5;
+  max-width: 740px;
+}
+
+/* ── idle prompt ── */
+#idle {
+  color: #3a4760;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  letter-spacing: .03em;
+}
+
+/* ── audio bar ── */
+#bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(10, 14, 20, .97);
+  padding: 9px 16px;
+  border-top: 1px solid #1e2a3a;
+}
+#bar audio {
+  flex: 1;
+  height: 36px;
+  accent-color: #7eb8d4;
+}
+#ctr {
+  color: #44506a;
+  font-size: .78rem;
+  font-family: monospace;
+  white-space: nowrap;
+  min-width: 56px;
+  text-align: right;
+}
+</style>
+</head>
+<body>
+<div id="gate" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0d1117;display:flex;align-items:center;justify-content:center;z-index:1000;">
+  <div style="text-align:center;color:#f5e6c8;font-family:Georgia,serif;">
+    <p style="font-size:1.5rem;margin-bottom:1.2rem;">Enter password to continue</p>
+    <input id="pwd" type="password" style="padding:8px 14px;font-size:1.1rem;border:1px solid #3a4760;background:#1a2232;color:#f5e6c8;border-radius:4px;outline:none;" placeholder="Password" autofocus />
+    <br><br>
+    <button onclick="checkPwd()" style="padding:8px 24px;font-size:1rem;background:#7eb8d4;color:#0d1117;border:none;border-radius:4px;cursor:pointer;">Enter</button>
+    <p id="gate-err" style="display:none;color:#e07070;margin-top:1rem;">Incorrect password. Please try again.</p>
+  </div>
+</div>
+<script>
+function checkPwd() {
+  if (document.getElementById('pwd').value === 'vedic2026') {
+    document.getElementById('gate').style.display = 'none';
+  } else {
+    document.getElementById('gate-err').style.display = '';
+    document.getElementById('pwd').value = '';
+    document.getElementById('pwd').focus();
+  }
+}
+document.getElementById('pwd').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkPwd();
+});
+</script>
+<div id="wrap">
+  <div id="stage">
+    <div id="idle">&#9654;&#xfe0e; Press play to begin</div>
+  <div class="slide" id="s0"><p class="vedic">Rik Veda</p><p class="quality">Holistic (Dynamic Silence)</p><p class="aspect">Whole Physiology</p></div>
+  <div class="slide" id="s1"><p class="vedic">Sama Veda</p><p class="quality">Flowing Wakefulness</p><p class="aspect">Sensory Systems</p></div>
+  <div class="slide" id="s2"><p class="vedic">Yajur-Veda</p><p class="quality">Offering and Creating</p><p class="aspect">Processing Systems</p></div>
+  <div class="slide" id="s3"><p class="vedic">Atharva Veda</p><p class="quality">Reverberating Wholeness</p><p class="aspect">Motor Systems</p></div>
+  <div class="slide" id="s4"><p class="vedic">Shiksha</p><p class="quality">Expressing</p><p class="aspect">Autonomic Ganglia: 36 books of Shiksha correspond to the 36 Autonomic Ganglia</p></div>
+  <div class="slide" id="s5"><p class="vedic">Kalp</p><p class="quality">Transforming</p><p class="aspect">Limbic System: 4 divisions of Kalp correspond to the 4 divisions of the Limbic System. Number of subdivisions: Shrauta-20, Grihya-19, Shulba-8, Dharma-7</p></div>
+  <div class="slide" id="s6"><p class="vedic">Vyakaran</p><p class="quality">Expanding</p><p class="aspect">Hypothalamus: 8 chapters of Vyakaran correspond to the 8 areas of the Hypothalamus</p></div>
+  <div class="slide" id="s7"><p class="vedic">Nirukt</p><p class="quality">Self-referral</p><p class="aspect">Pituitary Gland: 13 chapters of Nirukt correspond to the 13 response factors of the Pituitary Gland</p></div>
+  <div class="slide" id="s8"><p class="vedic">Chhand</p><p class="quality">Measuring and Quantifying</p><p class="aspect">Neurotransmitters and Neurohormones: 8 chapters of Chhand correspond to the Neurotransmitters and Neurohormones</p></div>
+  <div class="slide" id="s9"><p class="vedic">Jyotish</p><p class="quality">All-knowing</p><p class="aspect">The 9 Grahas correspond to the Basal Ganglia, the 27 Nakshatras to the Brainstem, the 12 Rashis to the 12 Cranial Nerves and the 12 Bhavas to 12 areas in the Cerebral Cortex</p></div>
+  <div class="slide" id="s10"><p class="vedic">Nyaya</p><p class="quality">Distinguishing and Deciding</p><p class="aspect">Thalamus: 5 chapters of Nyaya correspond to the 5 general divisions of the Thalamus</p></div>
+  <div class="slide" id="s11"><p class="vedic">Vaisheshik</p><p class="quality">Specifying</p><p class="aspect">Cerebellum: 10 chapters of Vaisheshik correspond to the 10 Lobules of the Cerebellum</p></div>
+  <div class="slide" id="s12"><p class="vedic">Samkhya</p><p class="quality">Enumerating</p><p class="aspect">Cerebral Cortex, Cells, Tissues and Organs: 6 chapters of Samkhya correspond to the 6 layers of the Cerebral Cortex and Cells, Tissues and Organs</p></div>
+  <div class="slide" id="s13"><p class="vedic">Yoga</p><p class="quality">Unifying</p><p class="aspect">Cortex: 4 chapters of Yoga correspond to the 4 lobes of the Cortex</p></div>
+  <div class="slide" id="s14"><p class="vedic">Karma Mimamsa</p><p class="quality">Analysing</p><p class="aspect">Central Nervous System: 12 chapters of Karma Mimansa correspond to the 12 divisions of the Central Nervous System</p></div>
+  <div class="slide" id="s15"><p class="vedic">Vedant</p><p class="quality">Lively Absolute</p><p class="aspect">Integrated functioning of the Central Nervous System</p></div>
+  <div class="slide" id="s16"><p class="vedic">Gandharva Veda</p><p class="quality">Integrating and harmonizing</p><p class="aspect">Cycles and Rhythms, Pacemakers Cells</p></div>
+  <div class="slide" id="s17"><p class="vedic">Dhanur-Veda</p><p class="quality">Invincible and Progressive</p><p class="aspect">Immune System, Biochemistry</p></div>
+  <div class="slide" id="s18"><p class="vedic">Sthapatya Veda</p><p class="quality">Establishing</p><p class="aspect">Anatomy</p></div>
+  <div class="slide" id="s19"><p class="vedic">Harita Samhita</p><p class="quality">Nourishing</p><p class="aspect">Venous and Biliary System</p></div>
+  <div class="slide" id="s20"><p class="vedic">Bhel Samhita</p><p class="quality">Differentiating</p><p class="aspect">Lymphatic System and Glial Cells</p></div>
+  <div class="slide" id="s21"><p class="vedic">Kashyap Samhita</p><p class="quality">Equivalency</p><p class="aspect">Arterial System</p></div>
+  <div class="slide" id="s22"><p class="vedic">Charak Samhita</p><p class="quality">Balancing-holding together and supporting</p><p class="aspect">Cell Nucleus</p></div>
+  <div class="slide" id="s23"><p class="vedic">Sushrut Samhita</p><p class="quality">Separating</p><p class="aspect">Cytoplasm and Cell Organelles</p></div>
+  <div class="slide" id="s24"><p class="vedic">Vagbhatt Samhita</p><p class="quality">Communication and Eloquence</p><p class="aspect">Cytoskeleton and Cell Membrane</p></div>
+  <div class="slide" id="s25"><p class="vedic">Madhav Nidan Samhita</p><p class="quality">Diagnosing</p><p class="aspect">Mesodermal Tissues</p></div>
+  <div class="slide" id="s26"><p class="vedic">Sharngadhar Samhita</p><p class="quality">Synthesizing</p><p class="aspect">Endodermal Tissues</p></div>
+  <div class="slide" id="s27"><p class="vedic">Bhava-Prakash Samhita</p><p class="quality">Enlightening</p><p class="aspect">Ectodermal Tissues</p></div>
+  <div class="slide" id="s28"><p class="vedic">Upanishad</p><p class="quality">Transcending</p><p class="aspect">Ascending Tracts: 10 important Upanishads correspond to the 10 primary Ascending Tracts of the Central Nervous System</p></div>
+  <div class="slide" id="s29"><p class="vedic">Aranyak</p><p class="quality">Stirring</p><p class="aspect">Fasciculi Propri: 6 main Aranyak correspond to the 6 Sets of Fasciculi Propri</p></div>
+  <div class="slide" id="s30"><p class="vedic">Brahmana</p><p class="quality">Structuring</p><p class="aspect">Descending Tracts: 14 main Brahmana correspond to the 14 main Descending Tracts of the Central Nervous System</p></div>
+  <div class="slide" id="s31"><p class="vedic">Itihas</p><p class="quality">Blossoming of Totality</p><p class="aspect">Voluntary Motor and Sensory Projections</p></div>
+  <div class="slide" id="s32"><p class="vedic">Ramayan</p><p class="quality">Blossoming of Totality</p><p class="aspect">Processes of the Vertebrae: 7 books of the Ramayan correspond to the 7 Processes of the Vertebrae</p></div>
+  <div class="slide" id="s33"><p class="vedic">Mahabharat</p><p class="quality">Blossoming of Totality</p><p class="aspect">Rexed layers: 18 books of the Mahabharat correspond to the 18 Rexed Layers</p></div>
+  <div class="slide" id="s34"><p class="vedic">Puran</p><p class="quality">Ancient and Eternal</p><p class="aspect">Great Intermediate Net: 18 Puran correspond to the 18 Rexed Layers in the Spinal Cord</p></div>
+  <div class="slide" id="s35"><p class="vedic">Smriti</p><p class="quality">Memory</p><p class="aspect">Memory Systems and Reflexes: 18 Smriti correspond to the 18 Nuclei of the Cranial Nerves</p></div>
+  <div class="slide" id="s36"><p class="vedic">Rk Veda Pratishakhya</p><p class="quality">All-Pervading Wholeness</p><p class="aspect">Cerebral Cortex Layer I</p></div>
+  <div class="slide" id="s37"><p class="vedic">Shukl-Yajur-Veda Pratishakhya</p><p class="quality">Silencing, Sharing and Spreading</p><p class="aspect">Cerebral Cortex Layer II</p></div>
+  <div class="slide" id="s38"><p class="vedic">Atharva Veda Pratishakhya</p><p class="quality">Unfolding</p><p class="aspect">Cerebral Cortex Layer V</p></div>
+  <div class="slide" id="s39"><p class="vedic">Atharva Veda Pratishakhya (Chaturadhyayi)</p><p class="quality">Dissolving</p><p class="aspect">Cerebral Cortex Layer VI</p></div>
+  <div class="slide" id="s40"><p class="vedic">Krishn-Yajur-Veda Pratishakhya (Taittiriya)</p><p class="quality">Omnipresent</p><p class="aspect">Cerebral Cortex Layer III</p></div>
+  <div class="slide" id="s41"><p class="vedic">Sama Veda Pratishakhya (Pushpa Sutram)</p><p class="quality">Unmanifesting the parts but manifesting the Whole</p><p class="aspect">Cerebral Cortex Layer IV</p></div>
+  </div>
+  <div id="bar">
+    <audio id="aud" controls preload="metadata" src="40-branches.mp3"></audio>
+    <span id="ctr"></span>
+  </div>
+</div>
+
+<script>
+const TIMES = [0.0, 18.819, 37.735, 56.242, 75.302, 121.687, 175.152, 212.106, 254.219, 303.724, 372.454, 396.001, 417.772, 445.376, 466.355, 492.423, 510.786, 531.142, 549.961, 567.101, 585.032, 603.204, 621.039, 639.859, 658.27, 677.834, 696.581, 715.233, 733.668, 759.087, 780.763, 803.638, 822.698, 845.741, 867.897, 889.716, 912.16, 932.563, 955.727, 976.562, 999.99, 1023.321];
+const N     = 42;
+const aud   = document.getElementById('aud');
+const idle  = document.getElementById('idle');
+const ctr   = document.getElementById('ctr');
+let cur     = -1;
+
+function show(idx) {
+  if (idx === cur) return;
+  if (cur >= 0) document.getElementById('s' + cur).classList.remove('active');
+  if (idx < 0) {
+    idle.style.display = '';
+    ctr.textContent   = '';
+  } else {
+    idle.style.display = 'none';
+    document.getElementById('s' + idx).classList.add('active');
+    ctr.textContent = (idx + 1) + ' / ' + N;
+  }
+  cur = idx;
+}
+
+function sync() {
+  const t = aud.currentTime;
+  let next = -1;
+  for (let i = 0; i < TIMES.length; i++) if (t >= TIMES[i]) next = i;
+  show(next);
+}
+
+// After a seek, force-clear all active slides then re-sync cleanly
+function forceSync() {
+  document.querySelectorAll('.slide.active')
+          .forEach(el => el.classList.remove('active'));
+  cur = -1;
+  idle.style.display = '';
+  sync();
+}
+
+aud.addEventListener('timeupdate', sync);
+aud.addEventListener('seeked',     forceSync);
+aud.addEventListener('ended',      () => show(-1));
+</script>
+</body>
+</html>
