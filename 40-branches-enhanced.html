@@ -252,6 +252,7 @@ html, body {
 .grp-item.devata   { color: #d478a0; border-color: #60243a; background: rgba(212,120,160,.07); }
 .grp-item.chhandas { color: #c8a84b; border-color: #604820; background: rgba(200,168,75,.07);  }
 .grp-item.source   { color: #f5e6c8; border-color: #3a4760; background: rgba(245,230,200,.07); }
+.grp-note { display: block; font-size: .75em; opacity: .65; margin-top: 3px; font-style: italic; }
 </style>
 </head>
 <body>
@@ -417,12 +418,14 @@ function initApp(TIMES, SLIDE_DATA) {
 
   // ── groups: slide index ranges and display info ───────────────────────
   const GROUPS = [
-    { name: 'Vedas',         desc: 'The four primordial expressions of Total Natural Law',      start: 0,  end: 3  },
-    { name: 'Vedāngas',      desc: 'The six limbs of the Veda',                                 start: 4,  end: 9  },
-    { name: 'Upāngas',       desc: 'The six philosophical systems — sub-limbs of the Veda',     start: 10, end: 15 },
-    { name: 'Upa-Vedas',     desc: 'Twelve auxiliary Vedas — applied and embodied knowledge',   start: 16, end: 27 },
-    { name: 'Brāhmanas',     desc: 'Commentaries, chronicles, and the field of memory',         start: 28, end: 35 },
-    { name: 'Prātishākhyas', desc: 'Six phonetic treatises — the finest layer of expression',  start: 36, end: 41 },
+    { name: 'Vedas',         desc: 'The four primordial expressions of Total Natural Law',     start: 0,  end: 3  },
+    { name: 'Vedāngas',      desc: 'The six limbs of the Veda',                                start: 4,  end: 9  },
+    { name: 'Upāngas',       desc: 'The six philosophical systems — sub-limbs of the Veda',    start: 10, end: 15 },
+    { name: 'Upa-Vedas',     desc: 'Twelve auxiliary Vedas — applied and embodied knowledge',  start: 16, end: 27 },
+    { name: 'Brāhmanas',     desc: 'Commentaries, chronicles, and the field of memory',        start: 28, end: 35,
+      display: [28, 29, 30, 31, 34, 35],           // Ramayan(32) & Mahabharat(33) shown as sub-entries of Itihas
+      notes:   { 31: 'incl. Ramayan · Mahabharat' } },
+    { name: 'Prātishākhyas', desc: 'Six phonetic treatises — the finest layer of expression', start: 36, end: 41 },
   ];
 
   function getGroupIdx(idx) {
@@ -448,31 +451,81 @@ function initApp(TIMES, SLIDE_DATA) {
 
   // ── group header banner ───────────────────────────────────────────────
   function showGroupHeader(gIdx) {
-    const g = GROUPS[gIdx];
-    const rdcOrder = { source: 0, rishi: 1, devata: 2, chhandas: 3 };
-    const members = [];
-    for (let i = g.start; i <= g.end; i++) {
-      members.push({ name: SLIDE_DATA[i] ? SLIDE_DATA[i][0] : '', rdc: RDC[i] || 'source' });
-    }
-    // Build rows of 3, sorting each triplet R → D → C for display
+    const g         = GROUPS[gIdx];
+    const rdcOrder  = { source: 0, rishi: 1, devata: 2, chhandas: 3 };
+    const displayIdx = g.display || (function() {
+      const a = []; for (let i = g.start; i <= g.end; i++) a.push(i); return a;
+    })();
+    const notes = g.notes || {};
+
+    const members = displayIdx.map(i => ({
+      idx:  i,
+      name: SLIDE_DATA[i] ? SLIDE_DATA[i][0] : '',
+      rdc:  RDC[i] || 'source',
+    }));
+
+    // Sort each triplet R → D → C for display
     const rows = [];
     for (let i = 0; i < members.length; i += 3) {
-      const chunk = members.slice(i, i + 3).sort((a, b) => rdcOrder[a.rdc] - rdcOrder[b.rdc]);
-      rows.push(chunk);
+      rows.push(members.slice(i, i + 3).sort((a, b) => rdcOrder[a.rdc] - rdcOrder[b.rdc]));
     }
     const rowsHTML = rows.map(row =>
       '<div class="grp-row">' +
-      row.map(m => '<div class="grp-item ' + m.rdc + '">' + m.name + '</div>').join('') +
+      row.map(m =>
+        '<div class="grp-item ' + m.rdc + '">' + m.name +
+        (notes[m.idx] ? '<span class="grp-note">' + notes[m.idx] + '</span>' : '') +
+        '</div>'
+      ).join('') +
       '</div>'
     ).join('');
 
-    grpHdr.querySelector('.grp-name').textContent    = g.name;
-    grpHdr.querySelector('.grp-desc').textContent    = g.desc;
-    grpHdr.querySelector('.grp-members').innerHTML   = rowsHTML;
-
+    grpHdr.querySelector('.grp-name').textContent  = g.name;
+    grpHdr.querySelector('.grp-desc').textContent  = g.desc;
+    grpHdr.querySelector('.grp-members').innerHTML = rowsHTML;
     grpHdr.classList.add('show');
     clearTimeout(grpHdr._ht);
-    grpHdr._ht = setTimeout(() => grpHdr.classList.remove('show'), 3600);
+
+    // Pause main audio while reading the header aloud
+    const wasPaused = aud.paused;
+    if (!wasPaused) aud.pause();
+
+    // Build speech text — include sub-entry notes
+    const memberSpeech = members.map(m =>
+      m.name + (notes[m.idx] ? ', including ' + notes[m.idx].replace('incl. ', '').replace(' · ', ' and ') : '')
+    ).join('. ');
+    const speakText = g.name + '. ' + g.desc + '. ' + memberSpeech + '.';
+
+    function resume() {
+      grpHdr._ht = setTimeout(() => {
+        grpHdr.classList.remove('show');
+        if (!wasPaused) aud.play().catch(() => {});
+      }, 900);
+    }
+
+    if (window.speechSynthesis) {
+      speechSynthesis.cancel();
+      const utt   = new SpeechSynthesisUtterance(speakText);
+      utt.lang    = 'en-US';
+      utt.rate    = 0.88;
+      utt.pitch   = 0.82;
+      utt.onend   = resume;
+      utt.onerror = resume;
+
+      function trySpeak() {
+        const voices = speechSynthesis.getVoices();
+        const male   =
+          voices.find(v => /en/i.test(v.lang) && /\bmale\b/i.test(v.name)) ||
+          voices.find(v => /en/i.test(v.lang) && /david|mark|james|george|daniel|guy|fred/i.test(v.name)) ||
+          voices.find(v => /en-US/i.test(v.lang) && !/(female|zira|samantha|victoria|kate|karen|fiona)/i.test(v.name));
+        if (male) utt.voice = male;
+        speechSynthesis.speak(utt);
+      }
+
+      if (speechSynthesis.getVoices().length > 0) { trySpeak(); }
+      else { speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true }); }
+    } else {
+      grpHdr._ht = setTimeout(resume, 5000);
+    }
   }
 
   function show(idx) {
