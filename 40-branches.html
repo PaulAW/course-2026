@@ -41,9 +41,25 @@ html, body {
   text-align: left;
 }
 #history::-webkit-scrollbar { display: none; }
+
+/* ── history panel right ── */
+#history-right {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  max-width: 200px;
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  pointer-events: none;
+  text-align: right;
+}
+#history-right::-webkit-scrollbar { display: none; }
+
 .h-entry { margin-bottom: 5px; }
 .h-name  { font-size: .64rem; color: #5a7090; line-height: 1.3; }
 .h-qual  { font-size: .58rem; color: #3d5268; font-style: italic; line-height: 1.3; padding-left: 5px; }
+#history-right .h-qual { padding-left: 0; padding-right: 5px; }
 
 /* ── slides ── */
 .slide {
@@ -157,9 +173,9 @@ html, body {
 #zone-mid { top: 33.33%; height: 33.34%; }
 #zone-bot { top: 66.67%; height: 33.33%; }
 
-/* ── hide history panel on small screens ── */
+/* ── hide history panels on small portrait screens ── */
 @media (max-width: 600px) {
-  #history { display: none; }
+  #history, #history-right { display: none; }
 }
 </style>
 </head>
@@ -178,6 +194,7 @@ html, body {
   <div id="stage">
     <div id="idle">&#9654;&#xfe0e; Tap centre to play</div>
     <div id="history"></div>
+    <div id="history-right"></div>
     <div id="zone-top">&#9650; Faster</div>
     <div id="zone-mid">&#9654; Play / Pause</div>
     <div id="zone-bot">&#9660; Slower</div>
@@ -265,8 +282,13 @@ function initApp(TIMES, SLIDE_DATA) {
   const aud  = document.getElementById('aud');
   const idle = document.getElementById('idle');
   const ctr  = document.getElementById('ctr');
-  const hist = document.getElementById('history');
+  const hist      = document.getElementById('history');
+  const histRight = document.getElementById('history-right');
   let cur    = -1;
+
+  function makeEntries(arr) {
+    return arr.map(([n, q]) => '<div class="h-entry"><div class="h-name">' + n + '</div><div class="h-qual">' + q + '</div></div>').join('');
+  }
 
   function show(idx) {
     if (idx === cur) return;
@@ -275,14 +297,16 @@ function initApp(TIMES, SLIDE_DATA) {
       idle.style.display = '';
       ctr.textContent   = '';
       hist.innerHTML    = '';
+      histRight.innerHTML = '';
     } else {
       idle.style.display = 'none';
       document.getElementById('s' + idx).classList.add('active');
       ctr.textContent = (idx + 1) + ' / ' + N;
-      hist.innerHTML = SLIDE_DATA.slice(0, idx)
-        .map(([n, q]) => '<div class="h-entry"><div class="h-name">' + n + '</div><div class="h-qual">' + q + '</div></div>')
-        .join('');
-      hist.scrollTop = hist.scrollHeight;
+      const HALF = Math.ceil(N / 2);
+      hist.innerHTML      = makeEntries(SLIDE_DATA.slice(0, Math.min(idx, HALF)));
+      histRight.innerHTML = makeEntries(SLIDE_DATA.slice(HALF, idx));
+      hist.scrollTop      = hist.scrollHeight;
+      histRight.scrollTop = histRight.scrollHeight;
     }
     cur = idx;
   }
@@ -411,6 +435,11 @@ function initApp(TIMES, SLIDE_DATA) {
   }
 
   document.getElementById('stage').addEventListener('click', function(e) {
+    // Go fullscreen when in landscape and not already fullscreen
+    if (window.innerWidth > window.innerHeight && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    }
+
     const rect = this.getBoundingClientRect();
     const relX = (e.clientX - rect.left) / rect.width;
     const relY = (e.clientY - rect.top)  / rect.height;
