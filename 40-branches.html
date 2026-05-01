@@ -139,16 +139,16 @@ html, body {
   flex-shrink: 0;
 }
 
-/* ── tap-zone hint overlays ── */
+/* ── tap-zone hint overlays (centre 50% only) ── */
 #zone-top, #zone-mid, #zone-bot {
   position: absolute;
-  left: 0; right: 0;
+  left: 25%; right: 25%;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   opacity: 0;
-  color: rgba(245,230,200,.18);
+  color: rgba(245,230,200,.22);
   font-size: clamp(.9rem, 2.5vw, 1.2rem);
   letter-spacing: .06em;
   transition: opacity .4s;
@@ -156,6 +156,11 @@ html, body {
 #zone-top { top: 0; height: 33.33%; }
 #zone-mid { top: 33.33%; height: 33.34%; }
 #zone-bot { top: 66.67%; height: 33.33%; }
+
+/* ── hide history panel on small screens ── */
+@media (max-width: 600px) {
+  #history { display: none; }
+}
 </style>
 </head>
 <body>
@@ -406,9 +411,17 @@ function initApp(TIMES, SLIDE_DATA) {
   }
 
   document.getElementById('stage').addEventListener('click', function(e) {
-    const rect   = this.getBoundingClientRect();
-    const relY   = (e.clientY - rect.top) / rect.height;
-    if (relY < 0.333) {
+    const rect = this.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width;
+    const relY = (e.clientY - rect.top)  / rect.height;
+
+    if (relX < 0.25) {
+      aud.currentTime = Math.max(0, aud.currentTime - 10);
+      showSeekFlash('left');
+    } else if (relX > 0.75) {
+      aud.currentTime = Math.min(aud.duration || 0, aud.currentTime + 30);
+      showSeekFlash('right');
+    } else if (relY < 0.333) {
       setSpeed(speed + 0.25);
       flashZone(zoneTop);
     } else if (relY < 0.667) {
