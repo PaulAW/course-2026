@@ -367,8 +367,16 @@ function initApp(TIMES, SLIDE_DATA) {
   const hist      = document.getElementById('history');
   const histRight = document.getElementById('history-right');
   const grpHdr    = document.getElementById('grp-hdr');
-  let cur      = -1;
-  let curGroup = -1;
+  let cur        = -1;
+  let curGroup   = -1;
+  let grpSpeaking = false;   // true while group header speech is active
+
+  function cancelGroupHeader() {
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    grpSpeaking = false;
+    clearTimeout(grpHdr._ht);
+    grpHdr.classList.remove('show');
+  }
 
   // ── RDC quality — one entry per slide (matches spreadsheet order) ─────
   const RDC = [
@@ -485,9 +493,9 @@ function initApp(TIMES, SLIDE_DATA) {
     grpHdr.classList.add('show');
     clearTimeout(grpHdr._ht);
 
-    // Pause main audio while reading the header aloud
-    const wasPaused = aud.paused;
-    if (!wasPaused) aud.pause();
+    // Block sync() from advancing slides and pause main audio
+    grpSpeaking = true;
+    aud.pause();
 
     // Build speech text — include sub-entry notes
     const memberSpeech = members.map(m =>
@@ -495,23 +503,31 @@ function initApp(TIMES, SLIDE_DATA) {
     ).join('. ');
     const speakText = g.name + '. ' + g.desc + '. ' + memberSpeech + '.';
 
+    // Called only when speech ends naturally (not when cancelled)
     function resume() {
+      grpSpeaking = false;
       grpHdr._ht = setTimeout(() => {
         grpHdr.classList.remove('show');
-        if (!wasPaused) aud.play().catch(() => {});
+        aud.play().catch(() => {});   // resume main audio
       }, 900);
     }
 
     if (window.speechSynthesis) {
       speechSynthesis.cancel();
-      const utt   = new SpeechSynthesisUtterance(speakText);
-      utt.lang    = 'en-US';
-      utt.rate    = 0.88;
-      utt.pitch   = 0.82;
-      utt.onend   = resume;
-      utt.onerror = resume;
+      const utt = new SpeechSynthesisUtterance(speakText);
+      utt.lang  = 'en-US';
+      utt.rate  = 0.88;
+      utt.pitch = 0.82;
+      utt.onend = resume;
+      // onerror fires on both real errors AND speechSynthesis.cancel() —
+      // only auto-resume on a real error, not on user-initiated cancel
+      utt.onerror = (e) => {
+        if (e.error !== 'canceled' && e.error !== 'interrupted') resume();
+        else grpSpeaking = false;   // cancelled externally — don't auto-resume
+      };
 
       function trySpeak() {
+        if (!grpSpeaking) return;   // was cancelled before voices loaded
         const voices = speechSynthesis.getVoices();
         const male   =
           voices.find(v => /en/i.test(v.lang) && /\bmale\b/i.test(v.name)) ||
@@ -524,7 +540,8 @@ function initApp(TIMES, SLIDE_DATA) {
       if (speechSynthesis.getVoices().length > 0) { trySpeak(); }
       else { speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true }); }
     } else {
-      grpHdr._ht = setTimeout(resume, 5000);
+      // No speech synthesis — just show for a fixed time then resume
+      grpHdr._ht = setTimeout(resume, 6000);
     }
   }
 
@@ -564,6 +581,7 @@ function initApp(TIMES, SLIDE_DATA) {
   }
 
   function sync() {
+    if (grpSpeaking) return;   // don't advance slides while group header is speaking
     const t = aud.currentTime;
     let next = -1;
     for (let i = 0; i < TIMES.length; i++) if (t >= TIMES[i]) next = i;
@@ -571,12 +589,12 @@ function initApp(TIMES, SLIDE_DATA) {
   }
 
   function forceSync() {
+    cancelGroupHeader();
     document.querySelectorAll('.slide.active').forEach(el =>
       el.classList.remove('active', 'rdc-rishi', 'rdc-devata', 'rdc-chhandas', 'rdc-source')
     );
     cur      = -1;
     curGroup = -1;
-    grpHdr.classList.remove('show');
     idle.style.display = '';
     sync();
   }
@@ -629,6 +647,7 @@ function initApp(TIMES, SLIDE_DATA) {
     switch (e.key) {
       case ' ':
         e.preventDefault();
+        cancelGroupHeader();
         aud.paused ? aud.play() : aud.pause();
         break;
       case 'ArrowRight':
@@ -671,7 +690,10 @@ function initApp(TIMES, SLIDE_DATA) {
     timeDisp.textContent = fmtTime(aud.currentTime) + ' / ' + fmtTime(aud.duration);
   }
 
-  playBtn.addEventListener('click', () => aud.paused ? aud.play() : aud.pause());
+  playBtn.addEventListener('click', () => {
+    cancelGroupHeader();
+    aud.paused ? aud.play() : aud.pause();
+  });
   prog.addEventListener('input', () => { aud.currentTime = parseFloat(prog.value); });
   aud.addEventListener('play',       updateBar);
   aud.addEventListener('pause',      updateBar);
@@ -699,6 +721,8 @@ function initApp(TIMES, SLIDE_DATA) {
     const rect = this.getBoundingClientRect();
     const relX = (e.clientX - rect.left) / rect.width;
     const relY = (e.clientY - rect.top)  / rect.height;
+
+    cancelGroupHeader();
 
     if (relX < 0.25) {
       aud.currentTime = Math.max(0, aud.currentTime - 10);
