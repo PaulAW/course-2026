@@ -1,0 +1,112 @@
+# Sanskrit / Vedic Pronunciation Guide for Google TTS
+# Format:  original text = phonetic replacement sent to TTS
+# Lines starting with # are ignored.  Edit the right side freely.
+# Run generate_branches.py after changes to hear the new audio.
+#
+# CONVENTION:
+#   Apostrophe (') marks the primary stressed syllable.
+#   All replacements use lowercase so TTS doesn't spell out capital letters.
+#   Final "-uh" = Sanskrit short 'a' (schwa), as in "about".
+#   "-ah" = longer open 'a', as in "father".
+#   "-oh" = long 'o', as in "go".
+#   "-ee" = long 'e', as in "feet".
+#   Hyphens separate syllables for readability; TTS ignores them.
+#
+# IMPORTANT: Have a Sanskrit-trained reviewer verify before final use.
+# You can re-run generate_branches.py at any time to hear the result.
+
+# ──────────────────────────────────────────────────────────────────────────────
+# GROUP NAMES  (used by edge-tts for group-header narration)
+# ──────────────────────────────────────────────────────────────────────────────
+Vedangas        = vay-'dahn-guz
+Upangas         = oo-'pahn-guz
+Upa-Vedas       = 'oo-puh vay-duz
+Brahmanas       = 'brah-muh-nuz
+Pratishakhyas   = pruh-'tee-shah-khyuz
+
+# ──────────────────────────────────────────────────────────────────────────────
+# THE FOUR VEDAS
+# ──────────────────────────────────────────────────────────────────────────────
+Rik Veda        = rik 'vay-duh
+Sama Veda       = 'sah-muh vay-duh
+Yajur-Veda      = 'yah-jur vay-duh
+Atharva Veda    = uh-'thar-vuh vay-duh
+
+# ──────────────────────────────────────────────────────────────────────────────
+# VEDANGAS  (limbs of the Veda)
+# ──────────────────────────────────────────────────────────────────────────────
+Shiksha         = 'shik-shah
+Kalpa           = 'kahl-puh
+Vyakarana       = vyah-'kah-ruh-nuh
+Nirukta         = nih-'rookt-uh
+Jyotish         = 'joh-tish
+Chhandas        = 'chhuhn-dus
+
+# ──────────────────────────────────────────────────────────────────────────────
+# UPANGAS  (philosophical systems)
+# ──────────────────────────────────────────────────────────────────────────────
+Nyaya           = 'nyah-yuh
+Vaisheshika     = vy-'shay-shih-kuh
+Sankhya         = 'sahnk-yuh
+Karma Mimamsa   = 'kar-muh mee-'mahm-sah
+Vedanta         = vay-'dahn-tuh
+
+# ──────────────────────────────────────────────────────────────────────────────
+# UPA-VEDAS  (auxiliary and applied Vedas)
+# ──────────────────────────────────────────────────────────────────────────────
+Gandharva Veda  = guhn-'dhar-vuh vay-duh
+Dhanur-Veda     = 'dhuh-nur vay-duh
+Sthapatya Veda  = stuh-'pah-tyuh vay-duh
+# Samhita = a compiled collection / text
+Samhita         = suhm-'hee-tuh
+Harita          = huh-'ree-tuh
+Bhel            = bale
+Kashyap         = 'kush-yup
+Charak          = 'chuh-ruk
+Sushrut         = 'soosh-root
+Vagbhatt        = 'vuhg-buht
+Madhav Nidan    = 'mah-dhuhv nih-'dahn
+Sharngadhar     = 'shahr-ng-uh-dhur
+Bhava-Prakash   = 'bhuh-vuh pruh-'kahsh
+
+# ──────────────────────────────────────────────────────────────────────────────
+# BRAHMANAS  (commentaries, epics, memory)
+# ──────────────────────────────────────────────────────────────────────────────
+Upanishad       = oo-'pah-nih-shud
+Aranyak         = uh-'ruhn-yuk
+Itihas          = ih-tih-'hahs
+Ramayan         = rah-'mah-yun
+Mahabharat      = mah-'hah-bah-rut
+Puran           = poo-'rahn
+Smriti          = 'smrih-tee
+# Fasciculi Propri — keep standard Latin/medical pronunciation as-is (TTS handles it)
+
+# ──────────────────────────────────────────────────────────────────────────────
+# PRATISHAKHYAS  (phonetic treatises)
+# ──────────────────────────────────────────────────────────────────────────────
+Pratishakhya    = pruh-'tee-shah-khyuh
+# Pushpa Sutram — individual words are handled well by TTS as-is
+Pushpa Sutram   = 'poosh-puh 'soo-trum
+Chaturadhyayi   = chuh-tur-'uhd-hyah-yee
+Taittiriya      = tie-tih-'ree-yuh
+# Shukla / Shukl
+Shukl           = shookl
+# Krishna / Krishn
+Krishn          = krish-nuh
+
+# ──────────────────────────────────────────────────────────────────────────────
+# COLUMN HEADER WORDS spoken in audio
+# ──────────────────────────────────────────────────────────────────────────────
+# Column C header: "Aspect of Physiology" — spoken clearly already by gTTS
+# Column D header: "Medical Definition"   — spoken clearly already by gTTS
+
+# ──────────────────────────────────────────────────────────────────────────────
+# COMMON COMPONENT WORDS  (appear inside longer phrases)
+# ──────────────────────────────────────────────────────────────────────────────
+Dharma          = 'dhar-muh
+Shrauta         = 'shroh-tuh
+Grihya          = 'grih-yuh
+Shulba          = 'shool-buh
+Veda            = 'vay-duh
+# Sutra / Sutram
+Sutra           = 'soo-truh
