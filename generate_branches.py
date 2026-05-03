@@ -35,7 +35,7 @@ if sys.version_info >= (3, 13):
     try:
         import audioop          # noqa: F401
     except ImportError:
-        print("Installing audioop-lts …"); _pip("audioop-lts")
+        print("Installing audioop-lts..."); _pip("audioop-lts")
 
 for _pkg, _mod in [
     ("openpyxl",  "openpyxl"),
@@ -46,7 +46,7 @@ for _pkg, _mod in [
     try:
         __import__(_mod)
     except ImportError:
-        print(f"Installing {_pkg} …"); _pip(_pkg)
+        print(f"Installing {_pkg}..."); _pip(_pkg)
 
 # ── check ffmpeg ───────────────────────────────────────────────────────────────
 if not shutil.which("ffmpeg"):
@@ -220,7 +220,7 @@ def build_group_header(gi: int) -> AudioSegment:
     display_idx = g.get("display") or list(range(g["start"], g["end"] + 1))
     notes       = g.get("notes", {})
 
-    print(f"  → group header: {g['name']}", flush=True)
+    print(f"  >> group header: {g['name']}", flush=True)
     audio  = sil(1_000)
     audio += GONG
     audio += sil(GAP_GRP_INTRO_MS)
@@ -289,7 +289,7 @@ for idx, row in enumerate(entries):
 dur_s      = len(track) / 1000.0
 mins, secs = divmod(dur_s, 60)
 print(f"\nTotal audio: {int(mins)}m {secs:.0f}s")
-print(f"Exporting {MP3_OUT.name} …", flush=True)
+print(f"Exporting {MP3_OUT.name}...", flush=True)
 track.export(str(MP3_OUT), format="mp3", bitrate="128k")
 print(f"Saved: {MP3_OUT}")
 
@@ -692,7 +692,7 @@ const MIN_SPEED = 0.25, MAX_SPEED = 3.0;
 function setSpeed(s) {{
   speed = Math.min(MAX_SPEED, Math.max(MIN_SPEED, Math.round(s*100)/100));
   aud.playbackRate = speed;
-  showBadge(speed.toFixed(2).replace(/\.?0+$/,'')+'×');
+  showBadge(speed.toFixed(2).replace(/\\.?0+$/,'')+'×');
 }}
 
 // ── UI helpers ────────────────────────────────────────────────────────────────

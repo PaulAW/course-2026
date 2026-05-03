@@ -31,8 +31,7 @@ html, body {
 /* ── history panel ── */
 #history {
   position: absolute;
-  top: 10px;
-  left: 12px;
+  top: 10px; left: 12px;
   max-width: 200px;
   max-height: calc(100% - 20px);
   overflow-y: auto;
@@ -41,37 +40,23 @@ html, body {
   text-align: left;
 }
 #history::-webkit-scrollbar { display: none; }
-
-/* ── history panel right ── */
-#history-right {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  max-width: 200px;
-  max-height: calc(100% - 20px);
-  overflow-y: auto;
-  scrollbar-width: none;
-  pointer-events: none;
-  text-align: right;
-}
-#history-right::-webkit-scrollbar { display: none; }
-
 .h-entry { margin-bottom: 5px; }
-.h-name  { font-size: .72rem; color: #5a7090; line-height: 1.3; }
-.h-qual  { font-size: .64rem; color: #3d5268; font-style: italic; line-height: 1.3; padding-left: 5px; }
-#history-right .h-qual { padding-left: 0; padding-right: 5px; }
-.h-group-label { font-size: .68rem; color: #2e4460; font-variant: small-caps; letter-spacing: .07em; margin: 9px 0 2px; }
+.h-name  { font-size: .82rem; color: #5a7090; line-height: 1.3; }
+.h-qual  { font-size: .74rem; color: #3d5268; font-style: italic; line-height: 1.3; padding-left: 5px; }
+.h-group-label {
+  font-size: .68rem; color: #4a6080; letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-top: 8px; margin-bottom: 2px;
+  border-top: 1px solid #1e2a3a; padding-top: 4px;
+}
+.h-group-label:first-child { margin-top: 0; border-top: none; padding-top: 0; }
 
 /* ── slides ── */
 .slide {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 16px;
-  max-width: 900px;
-  width: 100%;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: 16px;
+  max-width: 900px; width: 100%;
   animation: fi .5s ease;
 }
 .slide.active { display: flex; }
@@ -79,185 +64,71 @@ html, body {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+.vedic   { color: #f5e6c8; font-size: clamp(2rem,6vw,3.6rem); font-weight: bold; letter-spacing: .04em; line-height: 1.2; }
+.quality { color: #7eb8d4; font-size: clamp(1.15rem,3.4vw,2.1rem); font-style: italic; line-height: 1.35; }
+.aspect  { color: #7dc47d; font-size: clamp(.92rem,2.5vw,1.35rem); line-height: 1.5; max-width: 740px; }
+#idle    { color: #3a4760; font-size: clamp(1rem,2.5vw,1.25rem); letter-spacing: .03em; }
 
-/* ── text styles ── */
-.vedic {
-  color: #f5e6c8;
-  font-size: clamp(2rem, 6vw, 3.6rem);
-  font-weight: bold;
-  letter-spacing: .04em;
-  line-height: 1.2;
+/* ── group header overlay ── */
+#grp-hdr {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px;
+  background: rgba(10,14,20,0.94);
+  z-index: 50; opacity: 0; pointer-events: none;
+  transition: opacity 0.5s;
 }
-.quality {
-  color: #7eb8d4;
-  font-size: clamp(1.15rem, 3.4vw, 2.1rem);
-  font-style: italic;
-  line-height: 1.35;
+#grp-hdr.show { opacity: 1; }
+.grp-name { font-size: clamp(1.5rem,4.5vw,2.6rem); color: #f5e6c8; letter-spacing: .12em; text-transform: uppercase; }
+.grp-desc { font-size: clamp(.75rem,2vw,1rem); color: #5a7090; font-style: italic; }
+.grp-sep  { width: 50%; border: none; border-top: 1px solid #1e2a3a; margin: 2px 0; }
+.grp-members { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 820px; padding: 0 20px; }
+.grp-row  { display: flex; gap: 8px; justify-content: center; }
+.grp-item {
+  flex: 1; max-width: 260px; padding: 5px 10px; border-radius: 6px;
+  text-align: center; font-size: clamp(.6rem,1.5vw,.8rem); line-height: 1.3; border: 1px solid;
 }
-.aspect {
-  color: #7dc47d;
-  font-size: clamp(.92rem, 2.5vw, 1.35rem);
-  line-height: 1.5;
-  max-width: 740px;
-}
-
-/* ── idle prompt ── */
-#idle {
-  color: #3a4760;
-  font-size: clamp(1rem, 2.5vw, 1.25rem);
-  letter-spacing: .03em;
-}
+.grp-item.rishi    { color:#7eb8d4; border-color:#2a4a60; background:rgba(126,184,212,.07); }
+.grp-item.devata   { color:#d478a0; border-color:#60243a; background:rgba(212,120,160,.07); }
+.grp-item.chhandas { color:#c8a84b; border-color:#604820; background:rgba(200,168,75,.07);  }
+.grp-item.source   { color:#f5e6c8; border-color:#3a4760; background:rgba(245,230,200,.07); }
+.grp-note { display:block; font-size:.75em; opacity:.65; margin-top:3px; font-style:italic; }
 
 /* ── audio bar ── */
 #bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(10, 14, 20, .97);
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(10,14,20,.97);
   padding: 8px 14px;
   padding-bottom: max(8px, env(safe-area-inset-bottom));
   border-top: 1px solid #1e2a3a;
 }
 #playBtn {
-  width: 48px;
-  height: 48px;
-  background: #1e3048;
-  border: 1px solid #2a3a50;
-  color: #f5e6c8;
-  font-size: 1.4rem;
-  border-radius: 50%;
-  cursor: pointer;
-  flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  width:48px; height:48px; background:#1e3048; border:1px solid #2a3a50;
+  color:#f5e6c8; font-size:1.4rem; border-radius:50%; cursor:pointer;
+  flex-shrink:0; -webkit-tap-highlight-color:transparent; touch-action:manipulation;
 }
-#playBtn:active { background: #2a4060; }
-#prog {
-  flex: 1;
-  accent-color: #7eb8d4;
-  cursor: pointer;
-  touch-action: none;
-  height: 4px;
-}
-#time-disp {
-  color: #44506a;
-  font-size: .72rem;
-  font-family: monospace;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-#ctr {
-  color: #44506a;
-  font-size: .78rem;
-  font-family: monospace;
-  white-space: nowrap;
-  min-width: 56px;
-  text-align: right;
-  flex-shrink: 0;
-}
-
-/* ── tap-zone hint overlays (centre 50% only) ── */
+#playBtn:active { background:#2a4060; }
+#prog { flex:1; accent-color:#7eb8d4; cursor:pointer; touch-action:none; height:4px; }
+#time-disp { color:#44506a; font-size:.72rem; font-family:monospace; white-space:nowrap; flex-shrink:0; }
+#ctr { color:#44506a; font-size:.78rem; font-family:monospace; white-space:nowrap; min-width:56px; text-align:right; flex-shrink:0; }
 #zone-top, #zone-mid, #zone-bot {
-  position: absolute;
-  left: 25%; right: 25%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  opacity: 0;
-  color: rgba(245,230,200,.22);
-  font-size: clamp(.9rem, 2.5vw, 1.2rem);
-  letter-spacing: .06em;
-  transition: opacity .4s;
+  position:absolute; left:25%; right:25%;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none; opacity:0;
+  color:rgba(245,230,200,.22); font-size:clamp(.9rem,2.5vw,1.2rem);
+  letter-spacing:.06em; transition:opacity .4s;
 }
-#zone-top { top: 0; height: 33.33%; }
-#zone-mid { top: 33.33%; height: 33.34%; }
-#zone-bot { top: 66.67%; height: 33.33%; }
-
-/* ── hide history panels on small portrait screens ── */
-@media (max-width: 600px) {
-  #history, #history-right { display: none; }
-}
-
-/* ── RDC quality colors ─────────────────────────────────────────────── */
-/* Rishi — blue (knower / self-referral) */
-.rdc-rishi   .vedic   { color: #7eb8d4; }
-.rdc-rishi   .quality { color: #5a9ab8; }
-/* Devatā — rose (process of knowing) */
-.rdc-devata  .vedic   { color: #d478a0; }
-.rdc-devata  .quality { color: #b05880; }
-/* Chhandas — gold (known / expressed) */
-.rdc-chhandas .vedic  { color: #c8a84b; }
-.rdc-chhandas .quality { color: #a08030; }
-/* rdc-source keeps the default cream colour */
-
-/* ── group header overlay ────────────────────────────────────────────── */
-#grp-hdr {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: rgba(10, 14, 20, 0.94);
-  z-index: 50;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s;
-}
-#grp-hdr.show { opacity: 1; }
-.grp-name {
-  font-size: clamp(1.5rem, 4.5vw, 2.6rem);
-  color: #f5e6c8;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-.grp-desc {
-  font-size: clamp(.75rem, 2vw, 1rem);
-  color: #5a7090;
-  font-style: italic;
-  letter-spacing: .03em;
-  margin-bottom: 4px;
-}
-.grp-sep {
-  width: 50%;
-  border: none;
-  border-top: 1px solid #1e2a3a;
-  margin: 2px 0;
-}
-.grp-members {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-  max-width: 820px;
-  padding: 0 20px;
-}
-.grp-row {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-.grp-item {
-  flex: 1;
-  max-width: 260px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  text-align: center;
-  font-size: clamp(.6rem, 1.5vw, .8rem);
-  line-height: 1.3;
-  border: 1px solid;
-}
-.grp-item.rishi    { color: #7eb8d4; border-color: #2a4a60; background: rgba(126,184,212,.07); }
-.grp-item.devata   { color: #d478a0; border-color: #60243a; background: rgba(212,120,160,.07); }
-.grp-item.chhandas { color: #c8a84b; border-color: #604820; background: rgba(200,168,75,.07);  }
-.grp-item.source   { color: #f5e6c8; border-color: #3a4760; background: rgba(245,230,200,.07); }
-.grp-note { display: block; font-size: .75em; opacity: .65; margin-top: 3px; font-style: italic; }
+#zone-top { top:0; height:33.33%; }
+#zone-mid { top:33.33%; height:33.34%; }
+#zone-bot { top:66.67%; height:33.33%; }
+@media (max-width:600px) { #history { display:none; } }
 </style>
 </head>
 <body>
-<div id="gate" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0d1117;display:flex;align-items:center;justify-content:center;z-index:1000;">
+
+<!-- password gate (hidden if session already unlocked) -->
+<div id="gate" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0d1117;display:none;align-items:center;justify-content:center;z-index:1000;">
   <div style="text-align:center;color:#f5e6c8;font-family:Georgia,serif;">
     <p style="font-size:1.5rem;margin-bottom:1.2rem;">Enter password to continue</p>
     <input id="pwd" type="password" style="padding:8px 14px;font-size:1.1rem;border:1px solid #3a4760;background:#1a2232;color:#f5e6c8;border-radius:4px;outline:none;" placeholder="Password" autofocus />
@@ -271,7 +142,6 @@ html, body {
   <div id="stage">
     <div id="idle">&#9654;&#xfe0e; Tap centre to play</div>
     <div id="history"></div>
-    <div id="history-right"></div>
     <div id="grp-hdr">
       <div class="grp-name"></div>
       <div class="grp-desc"></div>
@@ -281,6 +151,48 @@ html, body {
     <div id="zone-top">&#9650; Faster</div>
     <div id="zone-mid">&#9654; Play / Pause</div>
     <div id="zone-bot">&#9660; Slower</div>
+  <div class="slide" id="s0"><p class="vedic">Rik Veda</p><p class="quality">Holistic (Dynamic Silence)</p><p class="aspect">Whole Physiology</p></div>
+  <div class="slide" id="s1"><p class="vedic">Sama Veda</p><p class="quality">Flowing Wakefulness</p><p class="aspect">Sensory Systems</p></div>
+  <div class="slide" id="s2"><p class="vedic">Yajur-Veda</p><p class="quality">Offering and Creating</p><p class="aspect">Processing Systems</p></div>
+  <div class="slide" id="s3"><p class="vedic">Atharva Veda</p><p class="quality">Reverberating Wholeness</p><p class="aspect">Motor Systems</p></div>
+  <div class="slide" id="s4"><p class="vedic">Shiksha</p><p class="quality">Expressing</p><p class="aspect">Autonomic Ganglia: 36 books of Shiksha correspond to the 36 Autonomic Ganglia</p></div>
+  <div class="slide" id="s5"><p class="vedic">Kalp</p><p class="quality">Transforming</p><p class="aspect">Limbic System: 4 divisions of Kalp correspond to the 4 divisions of the Limbic System. Number of subdivisions: Shrauta-20, Grihya-19, Shulba-8, Dharma-7</p></div>
+  <div class="slide" id="s6"><p class="vedic">Vyakaran</p><p class="quality">Expanding</p><p class="aspect">Hypothalamus: 8 chapters of Vyakaran correspond to the 8 areas of the Hypothalamus</p></div>
+  <div class="slide" id="s7"><p class="vedic">Nirukt</p><p class="quality">Self-referral</p><p class="aspect">Pituitary Gland: 13 chapters of Nirukt correspond to the 13 response factors of the Pituitary Gland</p></div>
+  <div class="slide" id="s8"><p class="vedic">Chhand</p><p class="quality">Measuring and Quantifying</p><p class="aspect">Neurotransmitters and Neurohormones: 8 chapters of Chhand correspond to the Neurotransmitters and Neurohormones</p></div>
+  <div class="slide" id="s9"><p class="vedic">Jyotish</p><p class="quality">All-knowing</p><p class="aspect">The 9 Grahas correspond to the Basal Ganglia, the 27 Nakshatras to the Brainstem, the 12 Rashis to the 12 Cranial Nerves and the 12 Bhavas to 12 areas in the Cerebral Cortex</p></div>
+  <div class="slide" id="s10"><p class="vedic">Nyaya</p><p class="quality">Distinguishing and Deciding</p><p class="aspect">Thalamus: 5 chapters of Nyaya correspond to the 5 general divisions of the Thalamus</p></div>
+  <div class="slide" id="s11"><p class="vedic">Vaisheshik</p><p class="quality">Specifying</p><p class="aspect">Cerebellum: 10 chapters of Vaisheshik correspond to the 10 Lobules of the Cerebellum</p></div>
+  <div class="slide" id="s12"><p class="vedic">Samkhya</p><p class="quality">Enumerating</p><p class="aspect">Cerebral Cortex, Cells, Tissues and Organs: 6 chapters of Samkhya correspond to the 6 layers of the Cerebral Cortex and Cells, Tissues and Organs</p></div>
+  <div class="slide" id="s13"><p class="vedic">Yoga</p><p class="quality">Unifying</p><p class="aspect">Cortex: 4 chapters of Yoga correspond to the 4 lobes of the Cortex</p></div>
+  <div class="slide" id="s14"><p class="vedic">Karma Mimamsa</p><p class="quality">Analysing</p><p class="aspect">Central Nervous System: 12 chapters of Karma Mimansa correspond to the 12 divisions of the Central Nervous System</p></div>
+  <div class="slide" id="s15"><p class="vedic">Vedant</p><p class="quality">Lively Absolute</p><p class="aspect">Integrated functioning of the Central Nervous System</p></div>
+  <div class="slide" id="s16"><p class="vedic">Gandharva Veda</p><p class="quality">Integrating and harmonizing</p><p class="aspect">Cycles and Rhythms, Pacemakers Cells</p></div>
+  <div class="slide" id="s17"><p class="vedic">Dhanur-Veda</p><p class="quality">Invincible and Progressive</p><p class="aspect">Immune System, Biochemistry</p></div>
+  <div class="slide" id="s18"><p class="vedic">Sthapatya Veda</p><p class="quality">Establishing</p><p class="aspect">Anatomy</p></div>
+  <div class="slide" id="s19"><p class="vedic">Harita Samhita</p><p class="quality">Nourishing</p><p class="aspect">Venous and Biliary System</p></div>
+  <div class="slide" id="s20"><p class="vedic">Bhel Samhita</p><p class="quality">Differentiating</p><p class="aspect">Lymphatic System and Glial Cells</p></div>
+  <div class="slide" id="s21"><p class="vedic">Kashyap Samhita</p><p class="quality">Equivalency</p><p class="aspect">Arterial System</p></div>
+  <div class="slide" id="s22"><p class="vedic">Charak Samhita</p><p class="quality">Balancing-holding together and supporting</p><p class="aspect">Cell Nucleus</p></div>
+  <div class="slide" id="s23"><p class="vedic">Sushrut Samhita</p><p class="quality">Separating</p><p class="aspect">Cytoplasm and Cell Organelles</p></div>
+  <div class="slide" id="s24"><p class="vedic">Vagbhatt Samhita</p><p class="quality">Communication and Eloquence</p><p class="aspect">Cytoskeleton and Cell Membrane</p></div>
+  <div class="slide" id="s25"><p class="vedic">Madhav Nidan Samhita</p><p class="quality">Diagnosing</p><p class="aspect">Mesodermal Tissues</p></div>
+  <div class="slide" id="s26"><p class="vedic">Sharngadhar Samhita</p><p class="quality">Synthesizing</p><p class="aspect">Endodermal Tissues</p></div>
+  <div class="slide" id="s27"><p class="vedic">Bhava-Prakash Samhita</p><p class="quality">Enlightening</p><p class="aspect">Ectodermal Tissues</p></div>
+  <div class="slide" id="s28"><p class="vedic">Upanishad</p><p class="quality">Transcending</p><p class="aspect">Ascending Tracts: 10 important Upanishads correspond to the 10 primary Ascending Tracts of the Central Nervous System</p></div>
+  <div class="slide" id="s29"><p class="vedic">Aranyak</p><p class="quality">Stirring</p><p class="aspect">Fasciculi Propri: 6 main Aranyak correspond to the 6 Sets of Fasciculi Propri</p></div>
+  <div class="slide" id="s30"><p class="vedic">Brahmana</p><p class="quality">Structuring</p><p class="aspect">Descending Tracts: 14 main Brahmana correspond to the 14 main Descending Tracts of the Central Nervous System</p></div>
+  <div class="slide" id="s31"><p class="vedic">Itihas</p><p class="quality">Blossoming of Totality</p><p class="aspect">Voluntary Motor and Sensory Projections</p></div>
+  <div class="slide" id="s32"><p class="vedic">Ramayan</p><p class="quality">Blossoming of Totality</p><p class="aspect">Processes of the Vertebrae: 7 books of the Ramayan correspond to the 7 Processes of the Vertebrae</p></div>
+  <div class="slide" id="s33"><p class="vedic">Mahabharat</p><p class="quality">Blossoming of Totality</p><p class="aspect">Rexed layers: 18 books of the Mahabharat correspond to the 18 Rexed Layers</p></div>
+  <div class="slide" id="s34"><p class="vedic">Puran</p><p class="quality">Ancient and Eternal</p><p class="aspect">Great Intermediate Net: 18 Puran correspond to the 18 Rexed Layers in the Spinal Cord</p></div>
+  <div class="slide" id="s35"><p class="vedic">Smriti</p><p class="quality">Memory</p><p class="aspect">Memory Systems and Reflexes: 18 Smriti correspond to the 18 Nuclei of the Cranial Nerves</p></div>
+  <div class="slide" id="s36"><p class="vedic">Rk Veda Pratishakhya</p><p class="quality">All-Pervading Wholeness</p><p class="aspect">Cerebral Cortex Layer I</p></div>
+  <div class="slide" id="s37"><p class="vedic">Shukl-Yajur-Veda Pratishakhya</p><p class="quality">Silencing, Sharing and Spreading</p><p class="aspect">Cerebral Cortex Layer II</p></div>
+  <div class="slide" id="s38"><p class="vedic">Atharva Veda Pratishakhya</p><p class="quality">Unfolding</p><p class="aspect">Cerebral Cortex Layer V</p></div>
+  <div class="slide" id="s39"><p class="vedic">Atharva Veda Pratishakhya (Chaturadhyayi)</p><p class="quality">Dissolving</p><p class="aspect">Cerebral Cortex Layer VI</p></div>
+  <div class="slide" id="s40"><p class="vedic">Krishn-Yajur-Veda Pratishakhya (Taittiriya)</p><p class="quality">Omnipresent</p><p class="aspect">Cerebral Cortex Layer III</p></div>
+  <div class="slide" id="s41"><p class="vedic">Sama Veda Pratishakhya (Pushpa Sutram)</p><p class="quality">Unmanifesting the parts but manifesting the Whole</p><p class="aspect">Cerebral Cortex Layer IV</p></div>
   </div>
   <div id="bar">
     <audio id="aud" preload="metadata" src="40-branches.mp3"></audio>
@@ -292,531 +204,283 @@ html, body {
 </div>
 
 <script>
-// ── encrypted payload (AES-256-GCM, key via PBKDF2-SHA256, 100k iterations) ──
-const _H = '2392e5b5c2b578dccc7cf83b271343a657df6f142fd712b51e183a37619b399e';
-const _S = 'Z1mndmTfaFL3TkPyt/cj4g==';
-const _V = '7OWfv8Z5/bUKxfyx';
-const _C = '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';
+// ── constants (generated by Python) ──────────────────────────────────────────
+const TIMES              = [50.518, 69.577, 87.797, 106.208, 219.881, 263.938, 314.355, 351.116, 393.062, 442.375, 594.557, 644.927, 694.456, 748.161, 798.219, 852.884, 1017.4, 1065.273, 1111.371, 1157.444, 1203.997, 1251.51, 1294.272, 1340.801, 1390.498, 1437.652, 1489.293, 1536.206, 1670.821, 1724.694, 1774.271, 1823.849, 1870.93, 1924.227, 1972.533, 2021.03, 2152.164, 2199.654, 2250.023, 2301.04, 2356.401, 2410.635];
+const GROUP_HEADER_RANGES= [[0.0, 46.518, 0], [121.508, 215.881, 1], [505.832, 590.558, 2], [892.653, 1013.4, 3], [1580.728, 1666.821, 4], [2071.047, 2148.164, 5]];   // [[start_s, end_s, groupIdx], ...]
+const GROUPS             = [{"name": "Vedas", "desc": "The four primordial expressions of Total Natural Law", "start": 0, "end": 3, "display": [0, 1, 2, 3], "notes": {}}, {"name": "Vedangas", "desc": "The six limbs of the Veda", "start": 4, "end": 9, "display": [4, 5, 6, 7, 8, 9], "notes": {}}, {"name": "Upangas", "desc": "The six philosophical systems, sub-limbs of the Veda", "start": 10, "end": 15, "display": [10, 11, 12, 13, 14, 15], "notes": {}}, {"name": "Upa-Vedas", "desc": "Twelve auxiliary Vedas, applied and embodied knowledge", "start": 16, "end": 27, "display": [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27], "notes": {}}, {"name": "Brahmanas", "desc": "Commentaries, chronicles, and the field of memory", "start": 28, "end": 35, "display": [28, 29, 30, 31, 34, 35], "notes": {"31": "incl. Ramayan and Mahabharat"}}, {"name": "Pratishakhyas", "desc": "Six phonetic treatises, the finest layer of expression", "start": 36, "end": 41, "display": [36, 37, 38, 39, 40, 41], "notes": {}}];
+const SLIDE_DATA         = [["Rik Veda", "Holistic (Dynamic Silence)"], ["Sama Veda", "Flowing Wakefulness"], ["Yajur-Veda", "Offering and Creating"], ["Atharva Veda", "Reverberating Wholeness"], ["Shiksha", "Expressing"], ["Kalp", "Transforming"], ["Vyakaran", "Expanding"], ["Nirukt", "Self-referral"], ["Chhand", "Measuring and Quantifying"], ["Jyotish", "All-knowing"], ["Nyaya", "Distinguishing and Deciding"], ["Vaisheshik", "Specifying"], ["Samkhya", "Enumerating"], ["Yoga", "Unifying"], ["Karma Mimamsa", "Analysing"], ["Vedant", "Lively Absolute"], ["Gandharva Veda", "Integrating and harmonizing"], ["Dhanur-Veda", "Invincible and Progressive"], ["Sthapatya Veda", "Establishing"], ["Harita Samhita", "Nourishing"], ["Bhel Samhita", "Differentiating"], ["Kashyap Samhita", "Equivalency"], ["Charak Samhita", "Balancing-holding together and supporting"], ["Sushrut Samhita", "Separating"], ["Vagbhatt Samhita", "Communication and Eloquence"], ["Madhav Nidan Samhita", "Diagnosing"], ["Sharngadhar Samhita", "Synthesizing"], ["Bhava-Prakash Samhita", "Enlightening"], ["Upanishad", "Transcending"], ["Aranyak", "Stirring"], ["Brahmana", "Structuring"], ["Itihas", "Blossoming of Totality"], ["Ramayan", "Blossoming of Totality"], ["Mahabharat", "Blossoming of Totality"], ["Puran", "Ancient and Eternal"], ["Smriti", "Memory"], ["Rk Veda Pratishakhya", "All-Pervading Wholeness"], ["Shukl-Yajur-Veda Pratishakhya", "Silencing, Sharing and Spreading"], ["Atharva Veda Pratishakhya", "Unfolding"], ["Atharva Veda Pratishakhya (Chaturadhyayi)", "Dissolving"], ["Krishn-Yajur-Veda Pratishakhya (Taittiriya)", "Omnipresent"], ["Sama Veda Pratishakhya (Pushpa Sutram)", "Unmanifesting the parts but manifesting the Whole"]];
+const N                  = 42;
 
-function b64ToArr(b64) {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-  return arr;
-}
+// ── RDC quality per slide (matches spreadsheet order) ────────────────────────
+const RDC = [
+  'source','rishi','devata','chhandas',          // 0-3  Vedas
+  'rishi','devata','chhandas','chhandas','devata','rishi',  // 4-9  Vedangas
+  'rishi','devata','chhandas','chhandas','devata','rishi',  // 10-15 Upangas
+  'rishi','devata','chhandas','chhandas','devata','rishi',  // 16-21 Upa-Vedas 1
+  'rishi','devata','chhandas','chhandas','devata','rishi',  // 22-27 Upa-Vedas 2
+  'rishi','devata','chhandas','chhandas',          // 28-31 Brahmanas 1
+  'chhandas','chhandas','devata','rishi',          // 32-35 Brahmanas 2
+  'rishi','devata','chhandas','chhandas','devata','rishi',  // 36-41 Pratishakhyas
+];
+const RDC_HIST = { rishi:'#3a7090', devata:'#903060', chhandas:'#806025', source:'#4a5a70' };
 
-async function checkPwd() {
-  const btn  = document.getElementById('enterBtn');
-  const errEl = document.getElementById('gate-err');
-  const pwd  = document.getElementById('pwd').value;
-  btn.disabled = true;
-  btn.textContent = 'Checking…';
-  errEl.style.display = 'none';
-
-  try {
-    const enc = new TextEncoder();
-
-    // SHA-256 hash check (fast rejection before expensive PBKDF2)
-    const hashBuf = await crypto.subtle.digest('SHA-256', enc.encode(pwd));
-    const hashHex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
-    if (hashHex !== _H) throw new Error('bad password');
-
-    // Derive AES-256-GCM key via PBKDF2
-    const keyMat = await crypto.subtle.importKey('raw', enc.encode(pwd), 'PBKDF2', false, ['deriveKey']);
-    const key = await crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt: b64ToArr(_S), iterations: 100000, hash: 'SHA-256' },
-      keyMat,
-      { name: 'AES-GCM', length: 256 },
-      false, ['decrypt']
-    );
-
-    // Decrypt payload
-    const plain = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: b64ToArr(_V) },
-      key, b64ToArr(_C)
-    );
-
-    const payload = JSON.parse(new TextDecoder().decode(plain));
-
-    // Persist password for this session (avoids re-entry when switching apps)
-    try { sessionStorage.setItem('_sb40', pwd); } catch(se) {}
-
-    // Inject slides into stage
-    const stage = document.getElementById('stage');
-    stage.insertAdjacentHTML('beforeend', payload.html);
-
-    // Hide gate, start app
-    document.getElementById('gate').style.display = 'none';
-    initApp(payload.times, payload.slideData);
-
-  } catch (e) {
-    errEl.style.display = '';
-    document.getElementById('pwd').value = '';
-    document.getElementById('pwd').focus();
-    btn.disabled = false;
-    btn.textContent = 'Enter';
-  }
-}
-
-document.getElementById('pwd').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') checkPwd();
-});
-document.getElementById('enterBtn').addEventListener('click', checkPwd);
-
-// ── Auto-login from sessionStorage (no re-entry when switching apps) ──────
-(async function tryAutoLogin() {
-  try {
-    const saved = sessionStorage.getItem('_sb40');
-    if (!saved) return;
-    const enc = new TextEncoder();
-    const hashBuf = await crypto.subtle.digest('SHA-256', enc.encode(saved));
-    const hashHex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
-    if (hashHex !== _H) { sessionStorage.removeItem('_sb40'); return; }
-    const keyMat = await crypto.subtle.importKey('raw', enc.encode(saved), 'PBKDF2', false, ['deriveKey']);
-    const key = await crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt: b64ToArr(_S), iterations: 100000, hash: 'SHA-256' },
-      keyMat, { name: 'AES-GCM', length: 256 }, false, ['decrypt']
-    );
-    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ToArr(_V) }, key, b64ToArr(_C));
-    const payload = JSON.parse(new TextDecoder().decode(plain));
-    document.getElementById('stage').insertAdjacentHTML('beforeend', payload.html);
-    document.getElementById('gate').style.display = 'none';
-    initApp(payload.times, payload.slideData);
-  } catch(e) {
-    sessionStorage.removeItem('_sb40');
-  }
+// ── password gate ─────────────────────────────────────────────────────────────
+(function initGate() {
+  const stored = sessionStorage.getItem('veda_pw_ok');
+  if (stored === 'yes') return;   // already unlocked this session
+  document.getElementById('gate').style.display = 'flex';
 })();
 
-function initApp(TIMES, SLIDE_DATA) {
-  const N    = TIMES.length;
-  const aud  = document.getElementById('aud');
-  const idle = document.getElementById('idle');
-  const ctr  = document.getElementById('ctr');
-  const hist      = document.getElementById('history');
-  const histRight = document.getElementById('history-right');
-  const grpHdr    = document.getElementById('grp-hdr');
-  let cur        = -1;
-  let curGroup   = -1;
-  let grpSpeaking = false;
-  let userPaused  = false;   // true when user explicitly paused
-  let intPausePos = -1;      // position when interrupted externally
-
-  // ── 1. Screen Wake Lock ───────────────────────────────────────────────
-  let wakeLock = null;
-  async function requestWakeLock() {
-    if ('wakeLock' in navigator) {
-      try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
-    }
+function checkPwd() {
+  const btn = document.getElementById('enterBtn');
+  const err = document.getElementById('gate-err');
+  if (document.getElementById('pwd').value === 'vedic2026') {
+    sessionStorage.setItem('veda_pw_ok', 'yes');
+    document.getElementById('gate').style.display = 'none';
+  } else {
+    err.style.display = '';
+    document.getElementById('pwd').value = '';
+    document.getElementById('pwd').focus();
   }
-  aud.addEventListener('play', requestWakeLock);
-  // Re-acquire after tab becomes visible again (wake lock releases on hide)
-  document.addEventListener('visibilitychange', async () => {
-    if (document.visibilityState === 'visible' && !aud.paused) await requestWakeLock();
+}
+document.getElementById('pwd').addEventListener('keydown', e => { if (e.key==='Enter') checkPwd(); });
+document.getElementById('enterBtn').addEventListener('click', checkPwd);
+
+// ── core elements ─────────────────────────────────────────────────────────────
+const aud     = document.getElementById('aud');
+const idle    = document.getElementById('idle');
+const ctr     = document.getElementById('ctr');
+const hist    = document.getElementById('history');
+const grpHdr  = document.getElementById('grp-hdr');
+let cur       = -1;
+let curGrp    = -1;
+
+// ── history panel ─────────────────────────────────────────────────────────────
+function getGroupIdx(idx) {
+  for (let g=0; g<GROUPS.length; g++)
+    if (idx >= GROUPS[g].start && idx <= GROUPS[g].end) return g;
+  return -1;
+}
+function makeEntries(arr, startIdx) {
+  let html = '', lastG = -1;
+  arr.forEach(([n, q], i) => {
+    const absIdx = startIdx + i;
+    const g = getGroupIdx(absIdx);
+    if (g !== lastG) {
+      lastG = g;
+      if (g >= 0) html += '<div class="h-group-label">[ ' + GROUPS[g].name + ' ]</div>';
+    }
+    const col = RDC_HIST[RDC[absIdx] || 'source'];
+    html += '<div class="h-entry">'
+      + '<div class="h-name" style="color:' + col + '">' + n + '</div>'
+      + '<div class="h-qual">' + q + '</div></div>';
   });
+  return html;
+}
 
-  // ── RDC quality — one entry per slide ─────────────────────────────────
-  const RDC = [
-    'source',    // 0:  Rik Veda
-    'rishi',     // 1:  Sama Veda
-    'devata',    // 2:  Yajur-Veda
-    'chhandas',  // 3:  Atharva Veda
-    'rishi',     // 4:  Shiksha
-    'devata',    // 5:  Kalp
-    'chhandas',  // 6:  Vyakaran
-    'chhandas',  // 7:  Nirukt
-    'devata',    // 8:  Chhand
-    'rishi',     // 9:  Jyotish
-    'rishi',     // 10: Nyaya
-    'devata',    // 11: Vaisheshik
-    'chhandas',  // 12: Samkhya
-    'chhandas',  // 13: Yoga
-    'devata',    // 14: Karma Mimamsa
-    'rishi',     // 15: Vedant
-    'rishi',     // 16: Gandharva Veda
-    'devata',    // 17: Dhanur-Veda
-    'chhandas',  // 18: Sthapatya Veda
-    'chhandas',  // 19: Harita Samhita
-    'devata',    // 20: Bhel Samhita
-    'rishi',     // 21: Kashyap Samhita
-    'rishi',     // 22: Charak Samhita
-    'devata',    // 23: Sushrut Samhita
-    'chhandas',  // 24: Vagbhatt Samhita
-    'chhandas',  // 25: Madhav Nidan Samhita
-    'devata',    // 26: Sharngadhar Samhita
-    'rishi',     // 27: Bhava-Prakash Samhita
-    'rishi',     // 28: Upanishad
-    'devata',    // 29: Aranyak
-    'chhandas',  // 30: Brahmana
-    'chhandas',  // 31: Itihas
-    'chhandas',  // 32: Ramayan
-    'chhandas',  // 33: Mahabharat
-    'devata',    // 34: Puran
-    'rishi',     // 35: Smriti
-    'rishi',     // 36: Rk Veda Pratishakhya
-    'devata',    // 37: Shukl-Yajur-Veda Pratishakhya
-    'chhandas',  // 38: Atharva Veda Pratishakhya
-    'chhandas',  // 39: Atharva Veda Pratishakhya (Chaturadhyayi)
-    'devata',    // 40: Krishn-Yajur-Veda Pratishakhya (Taittiriya)
-    'rishi',     // 41: Sama Veda Pratishakhya (Pushpa Sutram)
-  ];
+// ── group header overlay (visual only — audio is in the MP3) ─────────────────
+function showGroupHeaderVisual(gi) {
+  if (gi === curGrp) return;
+  curGrp = gi;
+  const g = GROUPS[gi];
+  const rdcOrder = { source:0, rishi:1, devata:2, chhandas:3 };
+  const dispIdx  = g.display || (()=>{ const a=[];for(let i=g.start;i<=g.end;i++)a.push(i);return a;})();
+  const notes    = g.notes || {};
+  const members  = dispIdx.map(i => ({ idx:i, name:SLIDE_DATA[i]?SLIDE_DATA[i][0]:'', rdc:RDC[i]||'source' }));
+  const rows=[]; for(let i=0;i<members.length;i+=3) rows.push(members.slice(i,i+3).sort((a,b)=>rdcOrder[a.rdc]-rdcOrder[b.rdc]));
+  grpHdr.querySelector('.grp-name').textContent = g.name;
+  grpHdr.querySelector('.grp-desc').textContent = g.desc;
+  grpHdr.querySelector('.grp-members').innerHTML = rows.map(row =>
+    '<div class="grp-row">' + row.map(m =>
+      '<div class="grp-item ' + m.rdc + '">' + m.name +
+      (notes[m.idx] ? '<span class="grp-note">' + notes[m.idx] + '</span>' : '') +
+      '</div>'
+    ).join('') + '</div>'
+  ).join('');
+  grpHdr.classList.add('show');
+}
+function hideGroupHeader() {
+  if (curGrp === -1) return;
+  curGrp = -1;
+  grpHdr.classList.remove('show');
+}
 
-  // ── groups ────────────────────────────────────────────────────────────
-  const GROUPS = [
-    { name: 'Vedas',         desc: 'The four primordial expressions of Total Natural Law',    start: 0,  end: 3  },
-    { name: 'Vedangas',      desc: 'The six limbs of the Veda',                               start: 4,  end: 9  },
-    { name: 'Upangas',       desc: 'The six philosophical systems — sub-limbs of the Veda',   start: 10, end: 15 },
-    { name: 'Upa-Vedas',     desc: 'Twelve auxiliary Vedas — applied and embodied knowledge', start: 16, end: 27 },
-    { name: 'Brahmanas',     desc: 'Commentaries, chronicles, and the field of memory',       start: 28, end: 35,
-      display: [28, 29, 30, 31, 34, 35],
-      notes:   { 31: 'incl. Ramayan · Mahabharat' } },
-    { name: 'Pratishakhyas', desc: 'Six phonetic treatises — the finest layer of expression', start: 36, end: 41 },
-  ];
-
-  function getGroupIdx(idx) {
-    for (let g = 0; g < GROUPS.length; g++) {
-      if (idx >= GROUPS[g].start && idx <= GROUPS[g].end) return g;
-    }
-    return -1;
+// ── slide show / hide ─────────────────────────────────────────────────────────
+function show(idx) {
+  if (idx === cur) return;
+  if (cur >= 0) {
+    const prev = document.getElementById('s'+cur);
+    if (prev) prev.classList.remove('active','rdc-rishi','rdc-devata','rdc-chhandas','rdc-source');
   }
-
-  const RDC_HIST = { rishi: '#3a7090', devata: '#903060', chhandas: '#806025', source: '#4a5a70' };
-
-  // ── 6. History panel: group labels + RDC colours ──────────────────────
-  function buildPanel(data, startIdx) {
-    let html = '';
-    let lastGroup = -1;
-    data.forEach(([n, q], i) => {
-      const absIdx = startIdx + i;
-      const g = getGroupIdx(absIdx);
-      if (g !== lastGroup) {
-        lastGroup = g;
-        if (g >= 0) html += '<div class="h-group-label">[ ' + GROUPS[g].name + ' ]</div>';
-      }
-      const rdc = RDC[absIdx] || 'source';
-      html += '<div class="h-entry">'
-        + '<div class="h-name" style="color:' + RDC_HIST[rdc] + '">' + n + '</div>'
-        + '<div class="h-qual">' + q + '</div>'
-        + '</div>';
-    });
-    return html;
+  if (idx < 0) {
+    idle.style.display=''; ctr.textContent=''; hist.innerHTML='';
+  } else {
+    idle.style.display='none';
+    const el  = document.getElementById('s'+idx);
+    const rdc = RDC[idx]||'source';
+    if (el) el.classList.add('active','rdc-'+rdc);
+    ctr.textContent = (idx+1)+' / '+N;
+    hist.innerHTML  = makeEntries(SLIDE_DATA.slice(0, idx), 0);
+    hist.scrollTop  = hist.scrollHeight;
   }
+  cur = idx;
+}
 
-  // ── cancel group header ───────────────────────────────────────────────
-  function cancelGroupHeader() {
-    if (window.speechSynthesis) speechSynthesis.cancel();
-    grpSpeaking = false;
-    clearTimeout(grpHdr._ht);
-    grpHdr.classList.remove('show');
-  }
+// ── group-header overlay driven by audio position ────────────────────────────
+function activeHeader(t) {
+  for (const [s,e,g] of GROUP_HEADER_RANGES)
+    if (t >= s && t < e) return g;
+  return -1;
+}
 
-  // ── 5. Roman-numeral → word helper (for TTS) ─────────────────────────
-  function romanToWords(text) {
-    // Context-sensitive "I" — only convert after Layer / Type / Part / Level etc.
-    text = text.replace(/\b(Layer|Type|Part|Level|Section|Lamina|Cortical)\s+I\b/g, '$1 one');
-    // Multi-char numerals first (longest-match order)
-    const map = {XII:'twelve',XI:'eleven',X:'ten',IX:'nine',VIII:'eight',
-                 VII:'seven',VI:'six',V:'five',IV:'four',III:'three',II:'two'};
-    return text.replace(/\b(XII|XI|IX|VIII|VII|VI|IV|III|II|X|V)\b/g, m => map[m] || m);
-  }
-
-  // ── group header overlay ──────────────────────────────────────────────
-  function showGroupHeader(gIdx) {
-    const g          = GROUPS[gIdx];
-    const rdcOrder   = { source: 0, rishi: 1, devata: 2, chhandas: 3 };
-    const displayIdx = g.display || (function() {
-      const a = []; for (let i = g.start; i <= g.end; i++) a.push(i); return a;
-    })();
-    const notes = g.notes || {};
-
-    const members = displayIdx.map(i => ({
-      idx:  i,
-      name: SLIDE_DATA[i] ? SLIDE_DATA[i][0] : '',
-      rdc:  RDC[i] || 'source',
-    }));
-
-    // Sort each row R → D → C for visual display
-    const rows = [];
-    for (let i = 0; i < members.length; i += 3) {
-      rows.push(members.slice(i, i + 3).sort((a, b) => rdcOrder[a.rdc] - rdcOrder[b.rdc]));
-    }
-    const rowsHTML = rows.map(row =>
-      '<div class="grp-row">' +
-      row.map(m =>
-        '<div class="grp-item ' + m.rdc + '">' + m.name +
-        (notes[m.idx] ? '<span class="grp-note">' + notes[m.idx] + '</span>' : '') +
-        '</div>'
-      ).join('') + '</div>'
-    ).join('');
-
-    grpHdr.querySelector('.grp-name').textContent  = g.name;
-    grpHdr.querySelector('.grp-desc').textContent  = g.desc;
-    grpHdr.querySelector('.grp-members').innerHTML = rowsHTML;
-    grpHdr.classList.add('show');
-    clearTimeout(grpHdr._ht);
-
-    grpSpeaking = true;
-    aud.pause();
-
-    const memberSpeech = members.map(m =>
-      m.name + (notes[m.idx] ? ', including ' + notes[m.idx].replace('incl. ', '').replace(' · ', ' and ') : '')
-    ).join('. ');
-    const speakText = romanToWords(g.name + '. ' + g.desc + '. ' + memberSpeech + '.');
-
-    function resume() {
-      grpSpeaking = false;
-      grpHdr._ht = setTimeout(() => {
-        grpHdr.classList.remove('show');
-        aud.play().catch(() => {});
-      }, 900);
-    }
-
-    if (window.speechSynthesis) {
-      speechSynthesis.cancel();
-      const utt = new SpeechSynthesisUtterance(speakText);
-      utt.lang  = 'en-US';
-      utt.rate  = 0.88;
-      utt.pitch = 0.82;
-      utt.onend = resume;
-      utt.onerror = (e) => {
-        if (e.error !== 'canceled' && e.error !== 'interrupted') resume();
-        else grpSpeaking = false;
-      };
-
-      // ── 7. Mobile voice — robust male-voice selection ─────────────────
-      function trySpeak() {
-        if (!grpSpeaking) return;
-        const voices = speechSynthesis.getVoices();
-        const male =
-          voices.find(v => /en/i.test(v.lang) && /\bmale\b/i.test(v.name)) ||
-          voices.find(v => /en/i.test(v.lang) && /david|mark|james|george|daniel|guy|fred|english.*male|male.*english/i.test(v.name)) ||
-          voices.find(v => /en-US/i.test(v.lang) && !/(female|zira|samantha|victoria|kate|karen|fiona|moira|tessa|allison|ava|susan|linda|heather)/i.test(v.name)) ||
-          voices.find(v => /en/i.test(v.lang));
-        if (male) utt.voice = male;
-        speechSynthesis.speak(utt);
-      }
-
-      if (speechSynthesis.getVoices().length > 0) { trySpeak(); }
-      else { speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true }); }
-    } else {
-      grpHdr._ht = setTimeout(resume, 6000);
-    }
-  }
-
-  // ── show slide ─────────────────────────────────────────────────────────
-  function show(idx) {
-    if (idx === cur) return;
-    if (cur >= 0) {
-      const prev = document.getElementById('s' + cur);
-      prev.classList.remove('active', 'rdc-rishi', 'rdc-devata', 'rdc-chhandas', 'rdc-source');
-    }
-    if (idx < 0) {
-      idle.style.display  = '';
-      ctr.textContent     = '';
-      hist.innerHTML      = '';
-      histRight.innerHTML = '';
-      curGroup = -1;
-    } else {
-      idle.style.display = 'none';
-      const el  = document.getElementById('s' + idx);
-      const rdc = RDC[idx] || 'source';
-      el.classList.add('active', 'rdc-' + rdc);
-
-      ctr.textContent = (idx + 1) + ' / ' + N;
-
-      const HALF = Math.ceil(N / 2);
-      hist.innerHTML      = buildPanel(SLIDE_DATA.slice(0, Math.min(idx, HALF)), 0);
-      histRight.innerHTML = buildPanel(SLIDE_DATA.slice(HALF, idx), HALF);
-      hist.scrollTop      = hist.scrollHeight;
-      histRight.scrollTop = histRight.scrollHeight;
-
-      const g = getGroupIdx(idx);
-      if (g !== curGroup) {
-        curGroup = g;
-        if (g >= 0 && idx === GROUPS[g].start) showGroupHeader(g);
-      }
-    }
-    cur = idx;
-  }
-
-  function sync() {
-    if (grpSpeaking) return;
-    const t = aud.currentTime;
+function sync() {
+  const t   = aud.currentTime;
+  const hdr = activeHeader(t);
+  if (hdr >= 0) {
+    showGroupHeaderVisual(hdr);
+  } else {
+    hideGroupHeader();
     let next = -1;
-    for (let i = 0; i < TIMES.length; i++) if (t >= TIMES[i]) next = i;
+    for (let i=0; i<TIMES.length; i++) if (t >= TIMES[i]) next = i;
     show(next);
   }
-
-  function forceSync() {
-    cancelGroupHeader();
-    document.querySelectorAll('.slide.active').forEach(el =>
-      el.classList.remove('active', 'rdc-rishi', 'rdc-devata', 'rdc-chhandas', 'rdc-source')
-    );
-    cur      = -1;
-    curGroup = -1;
-    idle.style.display = '';
-    sync();
-  }
-
-  aud.addEventListener('timeupdate', sync);
-  aud.addEventListener('seeked',     forceSync);
-  aud.addEventListener('ended',      () => show(-1));
-
-  // ── 2. Audio interruption detection ───────────────────────────────────
-  // When the tab goes hidden (e.g. Google Maps notification) and audio
-  // stops, resume from 2 s before the interruption point on return.
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      if (!aud.paused) intPausePos = aud.currentTime;
-    } else {
-      if (!userPaused && intPausePos >= 0 && aud.paused) {
-        aud.currentTime = Math.max(0, intPausePos - 2);
-        aud.play().catch(() => {});
-      }
-      intPausePos = -1;
-    }
-  });
-
-  // ── playback speed ─────────────────────────────────────────────────────
-  let speed = 1.0;
-  const MIN_SPEED = 0.25, MAX_SPEED = 3.0;
-
-  function setSpeed(s) {
-    speed = Math.min(MAX_SPEED, Math.max(MIN_SPEED, Math.round(s * 100) / 100));
-    aud.playbackRate = speed;
-    showBadge(speed.toFixed(2).replace(/\.?0+$/, '') + '×');
-  }
-
-  function showBadge(text) {
-    let b = document.getElementById('_badge');
-    if (!b) {
-      b = document.createElement('div');
-      b.id = '_badge';
-      b.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'
-        + 'background:rgba(0,0,0,.72);color:#f5e6c8;font-size:1.6rem;padding:12px 28px;'
-        + 'border-radius:10px;pointer-events:none;z-index:600;font-family:Georgia,serif;'
-        + 'transition:opacity .45s;';
-      document.body.appendChild(b);
-    }
-    b.textContent = text;
-    b.style.opacity = '1';
-    clearTimeout(b._t);
-    b._t = setTimeout(() => b.style.opacity = '0', 1100);
-  }
-
-  function showSeekFlash(side) {
-    const el = document.createElement('div');
-    el.textContent = side === 'left' ? '◀ 10s' : '30s ▶';
-    const pos = side === 'left' ? 'left:12%' : 'right:12%';
-    el.style.cssText = 'position:fixed;top:50%;' + pos + ';transform:translateY(-50%);'
-      + 'background:rgba(0,0,0,.65);color:#f5e6c8;font-size:1.3rem;padding:10px 22px;'
-      + 'border-radius:36px;pointer-events:none;opacity:1;transition:opacity .5s;'
-      + 'z-index:600;font-family:Georgia,serif;';
-    document.body.appendChild(el);
-    setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 520); }, 680);
-  }
-
-  // ── keyboard shortcuts ──────────────────────────────────────────────────────
-  document.addEventListener('keydown', function(e) {
-    switch (e.key) {
-      case ' ':
-        e.preventDefault();
-        cancelGroupHeader();
-        if (aud.paused) { userPaused = false; aud.play(); }
-        else            { userPaused = true;  aud.pause(); }
-        break;
-      case 'ArrowRight':
-        e.preventDefault();
-        aud.currentTime = Math.min(aud.currentTime + 30, aud.duration || 0);
-        showSeekFlash('right');
-        break;
-      case 'ArrowLeft':
-        e.preventDefault();
-        aud.currentTime = Math.max(aud.currentTime - 10, 0);
-        showSeekFlash('left');
-        break;
-      case 'f': case 'F':
-        e.preventDefault();
-        setSpeed(speed + 0.25);
-        break;
-      case 's': case 'S':
-        e.preventDefault();
-        setSpeed(speed - 0.25);
-        break;
-    }
-  });
-
-  // ── bottom controls ────────────────────────────────────────────────────────
-  const playBtn  = document.getElementById('playBtn');
-  const prog     = document.getElementById('prog');
-  const timeDisp = document.getElementById('time-disp');
-
-  function fmtTime(s) {
-    s = Math.round(s || 0);
-    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
-  }
-
-  function updateBar() {
-    playBtn.innerHTML = aud.paused ? '&#9654;' : '&#9646;&#9646;';
-    if (aud.duration) {
-      prog.max   = aud.duration;
-      prog.value = aud.currentTime;
-    }
-    timeDisp.textContent = fmtTime(aud.currentTime) + ' / ' + fmtTime(aud.duration);
-  }
-
-  playBtn.addEventListener('click', () => {
-    cancelGroupHeader();
-    if (aud.paused) { userPaused = false; aud.play(); }
-    else            { userPaused = true;  aud.pause(); }
-  });
-  prog.addEventListener('input', () => { aud.currentTime = parseFloat(prog.value); });
-  aud.addEventListener('play',           updateBar);
-  aud.addEventListener('pause',          updateBar);
-  aud.addEventListener('ended',          updateBar);
-  aud.addEventListener('timeupdate',     updateBar);
-  aud.addEventListener('loadedmetadata', updateBar);
-
-  // ── tap zones: top = faster, middle = play/pause, bottom = slower ──────────
-  const zoneTop = document.getElementById('zone-top');
-  const zoneMid = document.getElementById('zone-mid');
-  const zoneBot = document.getElementById('zone-bot');
-
-  function flashZone(el) {
-    el.style.opacity = '1';
-    clearTimeout(el._zt);
-    el._zt = setTimeout(() => { el.style.opacity = '0'; }, 700);
-  }
-
-  document.getElementById('stage').addEventListener('click', function(e) {
-    if (window.innerWidth > window.innerHeight && !document.fullscreenElement) {
-      document.documentElement.requestFullscreen?.().catch(() => {});
-    }
-
-    const rect = this.getBoundingClientRect();
-    const relX = (e.clientX - rect.left) / rect.width;
-    const relY = (e.clientY - rect.top)  / rect.height;
-
-    cancelGroupHeader();
-
-    if (relX < 0.25) {
-      aud.currentTime = Math.max(0, aud.currentTime - 10);
-      showSeekFlash('left');
-    } else if (relX > 0.75) {
-      aud.currentTime = Math.min(aud.duration || 0, aud.currentTime + 30);
-      showSeekFlash('right');
-    } else if (relY < 0.333) {
-      setSpeed(speed + 0.25);
-      flashZone(zoneTop);
-    } else if (relY < 0.667) {
-      if (aud.paused) { userPaused = false; aud.play(); }
-      else            { userPaused = true;  aud.pause(); }
-      flashZone(zoneMid);
-    } else {
-      setSpeed(speed - 0.25);
-      flashZone(zoneBot);
-    }
-  });
 }
+function forceSync() {
+  document.querySelectorAll('.slide.active').forEach(el =>
+    el.classList.remove('active','rdc-rishi','rdc-devata','rdc-chhandas','rdc-source'));
+  cur = -1; curGrp = -1;
+  grpHdr.classList.remove('show');
+  idle.style.display = '';
+  sync();
+}
+aud.addEventListener('timeupdate', sync);
+aud.addEventListener('seeked',     forceSync);
+aud.addEventListener('ended',      () => { hideGroupHeader(); show(-1); });
+
+// ── screen wake lock ──────────────────────────────────────────────────────────
+let wakeLock = null;
+async function acquireWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release().catch(()=>{}); wakeLock = null; }
+}
+aud.addEventListener('play',  acquireWakeLock);
+aud.addEventListener('pause', releaseWakeLock);
+aud.addEventListener('ended', releaseWakeLock);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && !aud.paused) acquireWakeLock();
+});
+
+// ── audio interruption detection ──────────────────────────────────────────────
+let userPaused   = false;
+let intPause     = false;   // true when our code pauses (not user, not Maps)
+let interruptedAt = null;
+
+aud.addEventListener('pause', () => {
+  if (intPause) { intPause = false; return; }
+  if (!userPaused) interruptedAt = aud.currentTime;
+});
+aud.addEventListener('play',  () => { interruptedAt = null; });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && interruptedAt !== null && !userPaused) {
+    aud.currentTime = Math.max(0, interruptedAt - 2);
+    interruptedAt = null;
+    aud.play().catch(()=>{});
+  }
+});
+
+// ── play/pause with user-intent tracking ─────────────────────────────────────
+function togglePlayPause() {
+  if (aud.paused) { userPaused = false; interruptedAt = null; aud.play().catch(()=>{}); }
+  else            { userPaused = true;  aud.pause(); }
+}
+
+// ── playback speed ────────────────────────────────────────────────────────────
+let speed = 1.0;
+const MIN_SPEED = 0.25, MAX_SPEED = 3.0;
+function setSpeed(s) {
+  speed = Math.min(MAX_SPEED, Math.max(MIN_SPEED, Math.round(s*100)/100));
+  aud.playbackRate = speed;
+  showBadge(speed.toFixed(2).replace(/\.?0+$/,'')+'×');
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function showBadge(text) {
+  let b = document.getElementById('_badge');
+  if (!b) {
+    b = document.createElement('div'); b.id='_badge';
+    b.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'
+      +'background:rgba(0,0,0,.72);color:#f5e6c8;font-size:1.6rem;padding:12px 28px;'
+      +'border-radius:10px;pointer-events:none;z-index:600;font-family:Georgia,serif;'
+      +'transition:opacity .45s;';
+    document.body.appendChild(b);
+  }
+  b.textContent=text; b.style.opacity='1';
+  clearTimeout(b._t); b._t=setTimeout(()=>b.style.opacity='0',1100);
+}
+function showSeekFlash(side) {
+  const el=document.createElement('div');
+  el.textContent=side==='left'?'◀ 10s':'30s ▶';
+  el.style.cssText='position:fixed;top:50%;'+(side==='left'?'left:12%':'right:12%')+';transform:translateY(-50%);'
+    +'background:rgba(0,0,0,.65);color:#f5e6c8;font-size:1.3rem;padding:10px 22px;'
+    +'border-radius:36px;pointer-events:none;opacity:1;transition:opacity .5s;z-index:600;font-family:Georgia,serif;';
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),520);},680);
+}
+function flashZone(el) {
+  el.style.opacity='1'; clearTimeout(el._zt);
+  el._zt=setTimeout(()=>{el.style.opacity='0';},700);
+}
+
+// ── bottom bar ────────────────────────────────────────────────────────────────
+const playBtn  = document.getElementById('playBtn');
+const prog     = document.getElementById('prog');
+const timeDisp = document.getElementById('time-disp');
+function fmtTime(s) {
+  s=Math.round(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+}
+function updateBar() {
+  playBtn.innerHTML = aud.paused ? '&#9654;' : '&#9646;&#9646;';
+  if (aud.duration) { prog.max=aud.duration; prog.value=aud.currentTime; }
+  timeDisp.textContent = fmtTime(aud.currentTime)+' / '+fmtTime(aud.duration);
+}
+playBtn.addEventListener('click', () => togglePlayPause());
+prog.addEventListener('input', () => { aud.currentTime = parseFloat(prog.value); });
+aud.addEventListener('play',          updateBar);
+aud.addEventListener('pause',         updateBar);
+aud.addEventListener('ended',         updateBar);
+aud.addEventListener('timeupdate',    updateBar);
+aud.addEventListener('loadedmetadata',updateBar);
+
+// ── keyboard shortcuts ────────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  switch (e.key) {
+    case ' ':         e.preventDefault(); togglePlayPause();  break;
+    case 'ArrowRight':e.preventDefault(); aud.currentTime=Math.min(aud.currentTime+30,aud.duration||0); showSeekFlash('right'); break;
+    case 'ArrowLeft': e.preventDefault(); aud.currentTime=Math.max(aud.currentTime-10,0); showSeekFlash('left'); break;
+    case 'f': case 'F': e.preventDefault(); setSpeed(speed+0.25); break;
+    case 's': case 'S': e.preventDefault(); setSpeed(speed-0.25); break;
+  }
+});
+
+// ── tap zones ─────────────────────────────────────────────────────────────────
+const zoneTop=document.getElementById('zone-top');
+const zoneMid=document.getElementById('zone-mid');
+const zoneBot=document.getElementById('zone-bot');
+document.getElementById('stage').addEventListener('click', function(e) {
+  if (window.innerWidth > window.innerHeight && !document.fullscreenElement)
+    document.documentElement.requestFullscreen?.().catch(()=>{});
+  const rect=this.getBoundingClientRect();
+  const relX=(e.clientX-rect.left)/rect.width;
+  const relY=(e.clientY-rect.top)/rect.height;
+  if      (relX < 0.25) { aud.currentTime=Math.max(0,aud.currentTime-10); showSeekFlash('left'); }
+  else if (relX > 0.75) { aud.currentTime=Math.min(aud.duration||0,aud.currentTime+30); showSeekFlash('right'); }
+  else if (relY < 0.333) { setSpeed(speed+0.25); flashZone(zoneTop); }
+  else if (relY < 0.667) { togglePlayPause(); flashZone(zoneMid); }
+  else                   { setSpeed(speed-0.25); flashZone(zoneBot); }
+});
 </script>
 </body>
 </html>
