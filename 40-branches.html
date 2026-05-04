@@ -57,9 +57,10 @@ html, body {
 #history-right::-webkit-scrollbar { display: none; }
 
 .h-entry { margin-bottom: 5px; }
-.h-name  { font-size: .64rem; color: #5a7090; line-height: 1.3; }
-.h-qual  { font-size: .58rem; color: #3d5268; font-style: italic; line-height: 1.3; padding-left: 5px; }
+.h-name  { font-size: .72rem; color: #5a7090; line-height: 1.3; }
+.h-qual  { font-size: .64rem; color: #3d5268; font-style: italic; line-height: 1.3; padding-left: 5px; }
 #history-right .h-qual { padding-left: 0; padding-right: 5px; }
+.h-group-label { font-size: .68rem; color: #2e4460; font-variant: small-caps; letter-spacing: .07em; margin: 9px 0 2px; }
 
 /* ── slides ── */
 .slide {
@@ -177,6 +178,82 @@ html, body {
 @media (max-width: 600px) {
   #history, #history-right { display: none; }
 }
+
+/* ── RDC quality colors ─────────────────────────────────────────────── */
+/* Rishi — blue (knower / self-referral) */
+.rdc-rishi   .vedic   { color: #7eb8d4; }
+.rdc-rishi   .quality { color: #5a9ab8; }
+/* Devatā — rose (process of knowing) */
+.rdc-devata  .vedic   { color: #d478a0; }
+.rdc-devata  .quality { color: #b05880; }
+/* Chhandas — gold (known / expressed) */
+.rdc-chhandas .vedic  { color: #c8a84b; }
+.rdc-chhandas .quality { color: #a08030; }
+/* rdc-source keeps the default cream colour */
+
+/* ── group header overlay ────────────────────────────────────────────── */
+#grp-hdr {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(10, 14, 20, 0.94);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+#grp-hdr.show { opacity: 1; }
+.grp-name {
+  font-size: clamp(1.5rem, 4.5vw, 2.6rem);
+  color: #f5e6c8;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.grp-desc {
+  font-size: clamp(.75rem, 2vw, 1rem);
+  color: #5a7090;
+  font-style: italic;
+  letter-spacing: .03em;
+  margin-bottom: 4px;
+}
+.grp-sep {
+  width: 50%;
+  border: none;
+  border-top: 1px solid #1e2a3a;
+  margin: 2px 0;
+}
+.grp-members {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 820px;
+  padding: 0 20px;
+}
+.grp-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.grp-item {
+  flex: 1;
+  max-width: 260px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: clamp(.6rem, 1.5vw, .8rem);
+  line-height: 1.3;
+  border: 1px solid;
+}
+.grp-item.rishi    { color: #7eb8d4; border-color: #2a4a60; background: rgba(126,184,212,.07); }
+.grp-item.devata   { color: #d478a0; border-color: #60243a; background: rgba(212,120,160,.07); }
+.grp-item.chhandas { color: #c8a84b; border-color: #604820; background: rgba(200,168,75,.07);  }
+.grp-item.source   { color: #f5e6c8; border-color: #3a4760; background: rgba(245,230,200,.07); }
+.grp-note { display: block; font-size: .75em; opacity: .65; margin-top: 3px; font-style: italic; }
 </style>
 </head>
 <body>
@@ -195,6 +272,12 @@ html, body {
     <div id="idle">&#9654;&#xfe0e; Tap centre to play</div>
     <div id="history"></div>
     <div id="history-right"></div>
+    <div id="grp-hdr">
+      <div class="grp-name"></div>
+      <div class="grp-desc"></div>
+      <hr class="grp-sep">
+      <div class="grp-members"></div>
+    </div>
     <div id="zone-top">&#9650; Faster</div>
     <div id="zone-mid">&#9654; Play / Pause</div>
     <div id="zone-bot">&#9660; Slower</div>
@@ -255,6 +338,9 @@ async function checkPwd() {
 
     const payload = JSON.parse(new TextDecoder().decode(plain));
 
+    // Persist password for this session (avoids re-entry when switching apps)
+    try { sessionStorage.setItem('_sb40', pwd); } catch(se) {}
+
     // Inject slides into stage
     const stage = document.getElementById('stage');
     stage.insertAdjacentHTML('beforeend', payload.html);
@@ -277,6 +363,30 @@ document.getElementById('pwd').addEventListener('keydown', function(e) {
 });
 document.getElementById('enterBtn').addEventListener('click', checkPwd);
 
+// ── Auto-login from sessionStorage (no re-entry when switching apps) ──────
+(async function tryAutoLogin() {
+  try {
+    const saved = sessionStorage.getItem('_sb40');
+    if (!saved) return;
+    const enc = new TextEncoder();
+    const hashBuf = await crypto.subtle.digest('SHA-256', enc.encode(saved));
+    const hashHex = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    if (hashHex !== _H) { sessionStorage.removeItem('_sb40'); return; }
+    const keyMat = await crypto.subtle.importKey('raw', enc.encode(saved), 'PBKDF2', false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: b64ToArr(_S), iterations: 100000, hash: 'SHA-256' },
+      keyMat, { name: 'AES-GCM', length: 256 }, false, ['decrypt']
+    );
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ToArr(_V) }, key, b64ToArr(_C));
+    const payload = JSON.parse(new TextDecoder().decode(plain));
+    document.getElementById('stage').insertAdjacentHTML('beforeend', payload.html);
+    document.getElementById('gate').style.display = 'none';
+    initApp(payload.times, payload.slideData);
+  } catch(e) {
+    sessionStorage.removeItem('_sb40');
+  }
+})();
+
 function initApp(TIMES, SLIDE_DATA) {
   const N    = TIMES.length;
   const aud  = document.getElementById('aud');
@@ -284,34 +394,253 @@ function initApp(TIMES, SLIDE_DATA) {
   const ctr  = document.getElementById('ctr');
   const hist      = document.getElementById('history');
   const histRight = document.getElementById('history-right');
-  let cur    = -1;
+  const grpHdr    = document.getElementById('grp-hdr');
+  let cur        = -1;
+  let curGroup   = -1;
+  let grpSpeaking = false;
+  let userPaused   = false;   // true when user explicitly paused
+  let interruptedAt = null;  // position when interrupted externally
+  let _resumeTimer  = null;
 
-  function makeEntries(arr) {
-    return arr.map(([n, q]) => '<div class="h-entry"><div class="h-name">' + n + '</div><div class="h-qual">' + q + '</div></div>').join('');
+  // ── 1. Screen Wake Lock ───────────────────────────────────────────────
+  let wakeLock = null;
+  async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+      try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+    }
+  }
+  aud.addEventListener('play', requestWakeLock);
+  // Re-acquire after tab becomes visible again (wake lock releases on hide)
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && !aud.paused) await requestWakeLock();
+  });
+
+  // ── RDC quality — one entry per slide ─────────────────────────────────
+  const RDC = [
+    'source',    // 0:  Rik Veda
+    'rishi',     // 1:  Sama Veda
+    'devata',    // 2:  Yajur-Veda
+    'chhandas',  // 3:  Atharva Veda
+    'rishi',     // 4:  Shiksha
+    'devata',    // 5:  Kalp
+    'chhandas',  // 6:  Vyakaran
+    'chhandas',  // 7:  Nirukt
+    'devata',    // 8:  Chhand
+    'rishi',     // 9:  Jyotish
+    'rishi',     // 10: Nyaya
+    'devata',    // 11: Vaisheshik
+    'chhandas',  // 12: Samkhya
+    'chhandas',  // 13: Yoga
+    'devata',    // 14: Karma Mimamsa
+    'rishi',     // 15: Vedant
+    'rishi',     // 16: Gandharva Veda
+    'devata',    // 17: Dhanur-Veda
+    'chhandas',  // 18: Sthapatya Veda
+    'chhandas',  // 19: Harita Samhita
+    'devata',    // 20: Bhel Samhita
+    'rishi',     // 21: Kashyap Samhita
+    'rishi',     // 22: Charak Samhita
+    'devata',    // 23: Sushrut Samhita
+    'chhandas',  // 24: Vagbhatt Samhita
+    'chhandas',  // 25: Madhav Nidan Samhita
+    'devata',    // 26: Sharngadhar Samhita
+    'rishi',     // 27: Bhava-Prakash Samhita
+    'rishi',     // 28: Upanishad
+    'devata',    // 29: Aranyak
+    'chhandas',  // 30: Brahmana
+    'chhandas',  // 31: Itihas
+    'chhandas',  // 32: Ramayan
+    'chhandas',  // 33: Mahabharat
+    'devata',    // 34: Puran
+    'rishi',     // 35: Smriti
+    'rishi',     // 36: Rk Veda Pratishakhya
+    'devata',    // 37: Shukl-Yajur-Veda Pratishakhya
+    'chhandas',  // 38: Atharva Veda Pratishakhya
+    'chhandas',  // 39: Atharva Veda Pratishakhya (Chaturadhyayi)
+    'devata',    // 40: Krishn-Yajur-Veda Pratishakhya (Taittiriya)
+    'rishi',     // 41: Sama Veda Pratishakhya (Pushpa Sutram)
+  ];
+
+  // ── groups ────────────────────────────────────────────────────────────
+  const GROUPS = [
+    { name: 'Vedas',         desc: 'The four primordial expressions of Total Natural Law',    start: 0,  end: 3  },
+    { name: 'Vedangas',      desc: 'The six limbs of the Veda',                               start: 4,  end: 9  },
+    { name: 'Upangas',       desc: 'The six philosophical systems — sub-limbs of the Veda',   start: 10, end: 15 },
+    { name: 'Upa-Vedas',     desc: 'Twelve auxiliary Vedas — applied and embodied knowledge', start: 16, end: 27 },
+    { name: 'Brahmanas',     desc: 'Commentaries, chronicles, and the field of memory',       start: 28, end: 35,
+      display: [28, 29, 30, 31, 34, 35],
+      notes:   { 31: 'incl. Ramayan · Mahabharat' } },
+    { name: 'Pratishakhyas', desc: 'Six phonetic treatises — the finest layer of expression', start: 36, end: 41 },
+  ];
+
+  function getGroupIdx(idx) {
+    for (let g = 0; g < GROUPS.length; g++) {
+      if (idx >= GROUPS[g].start && idx <= GROUPS[g].end) return g;
+    }
+    return -1;
   }
 
+  const RDC_HIST = { rishi: '#3a7090', devata: '#903060', chhandas: '#806025', source: '#4a5a70' };
+
+  // ── 6. History panel: group labels + RDC colours ──────────────────────
+  function buildPanel(data, startIdx) {
+    let html = '';
+    let lastGroup = -1;
+    data.forEach(([n, q], i) => {
+      const absIdx = startIdx + i;
+      const g = getGroupIdx(absIdx);
+      if (g !== lastGroup) {
+        lastGroup = g;
+        if (g >= 0) html += '<div class="h-group-label">[ ' + GROUPS[g].name + ' ]</div>';
+      }
+      const rdc = RDC[absIdx] || 'source';
+      html += '<div class="h-entry">'
+        + '<div class="h-name" style="color:' + RDC_HIST[rdc] + '">' + n + '</div>'
+        + '<div class="h-qual">' + q + '</div>'
+        + '</div>';
+    });
+    return html;
+  }
+
+  // ── cancel group header ───────────────────────────────────────────────
+  function cancelGroupHeader() {
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    grpSpeaking = false;
+    clearTimeout(grpHdr._ht);
+    grpHdr.classList.remove('show');
+  }
+
+  // ── 5. Roman-numeral → word helper (for TTS) ─────────────────────────
+  function romanToWords(text) {
+    // Context-sensitive "I" — only convert after Layer / Type / Part / Level etc.
+    text = text.replace(/\b(Layer|Type|Part|Level|Section|Lamina|Cortical)\s+I\b/g, '$1 one');
+    // Multi-char numerals first (longest-match order)
+    const map = {XII:'twelve',XI:'eleven',X:'ten',IX:'nine',VIII:'eight',
+                 VII:'seven',VI:'six',V:'five',IV:'four',III:'three',II:'two'};
+    return text.replace(/\b(XII|XI|IX|VIII|VII|VI|IV|III|II|X|V)\b/g, m => map[m] || m);
+  }
+
+  // ── group header overlay ──────────────────────────────────────────────
+  function showGroupHeader(gIdx) {
+    const g          = GROUPS[gIdx];
+    const rdcOrder   = { source: 0, rishi: 1, devata: 2, chhandas: 3 };
+    const displayIdx = g.display || (function() {
+      const a = []; for (let i = g.start; i <= g.end; i++) a.push(i); return a;
+    })();
+    const notes = g.notes || {};
+
+    const members = displayIdx.map(i => ({
+      idx:  i,
+      name: SLIDE_DATA[i] ? SLIDE_DATA[i][0] : '',
+      rdc:  RDC[i] || 'source',
+    }));
+
+    // Sort each row R → D → C for visual display
+    const rows = [];
+    for (let i = 0; i < members.length; i += 3) {
+      rows.push(members.slice(i, i + 3).sort((a, b) => rdcOrder[a.rdc] - rdcOrder[b.rdc]));
+    }
+    const rowsHTML = rows.map(row =>
+      '<div class="grp-row">' +
+      row.map(m =>
+        '<div class="grp-item ' + m.rdc + '">' + m.name +
+        (notes[m.idx] ? '<span class="grp-note">' + notes[m.idx] + '</span>' : '') +
+        '</div>'
+      ).join('') + '</div>'
+    ).join('');
+
+    grpHdr.querySelector('.grp-name').textContent  = g.name;
+    grpHdr.querySelector('.grp-desc').textContent  = g.desc;
+    grpHdr.querySelector('.grp-members').innerHTML = rowsHTML;
+    grpHdr.classList.add('show');
+    clearTimeout(grpHdr._ht);
+
+    grpSpeaking = true;
+    aud.pause();
+
+    const memberSpeech = members.map(m =>
+      m.name + (notes[m.idx] ? ', including ' + notes[m.idx].replace('incl. ', '').replace(' · ', ' and ') : '')
+    ).join('. ');
+    const speakText = romanToWords(g.name + '. ' + g.desc + '. ' + memberSpeech + '.');
+
+    function resume() {
+      grpSpeaking = false;
+      grpHdr._ht = setTimeout(() => {
+        grpHdr.classList.remove('show');
+        aud.play().catch(() => {});
+      }, 900);
+    }
+
+    if (window.speechSynthesis) {
+      speechSynthesis.cancel();
+      const utt = new SpeechSynthesisUtterance(speakText);
+      utt.lang  = 'en-US';
+      utt.rate  = 0.88;
+      utt.pitch = 0.82;
+      utt.onend = resume;
+      utt.onerror = (e) => {
+        if (e.error !== 'canceled' && e.error !== 'interrupted') resume();
+        else grpSpeaking = false;
+      };
+
+      // ── 7. Mobile voice — robust male-voice selection ─────────────────
+      function trySpeak() {
+        if (!grpSpeaking) return;
+        const voices = speechSynthesis.getVoices();
+        const male =
+          voices.find(v => /en/i.test(v.lang) && /\bmale\b/i.test(v.name)) ||
+          voices.find(v => /en/i.test(v.lang) && /david|mark|james|george|daniel|guy|fred|english.*male|male.*english/i.test(v.name)) ||
+          voices.find(v => /en-US/i.test(v.lang) && !/(female|zira|samantha|victoria|kate|karen|fiona|moira|tessa|allison|ava|susan|linda|heather)/i.test(v.name)) ||
+          voices.find(v => /en/i.test(v.lang));
+        if (male) utt.voice = male;
+        speechSynthesis.speak(utt);
+      }
+
+      if (speechSynthesis.getVoices().length > 0) { trySpeak(); }
+      else { speechSynthesis.addEventListener('voiceschanged', trySpeak, { once: true }); }
+    } else {
+      grpHdr._ht = setTimeout(resume, 6000);
+    }
+  }
+
+  // ── show slide ─────────────────────────────────────────────────────────
   function show(idx) {
     if (idx === cur) return;
-    if (cur >= 0) document.getElementById('s' + cur).classList.remove('active');
+    if (cur >= 0) {
+      const prev = document.getElementById('s' + cur);
+      prev.classList.remove('active', 'rdc-rishi', 'rdc-devata', 'rdc-chhandas', 'rdc-source');
+    }
     if (idx < 0) {
-      idle.style.display = '';
-      ctr.textContent   = '';
-      hist.innerHTML    = '';
+      idle.style.display  = '';
+      ctr.textContent     = '';
+      hist.innerHTML      = '';
       histRight.innerHTML = '';
+      curGroup = -1;
     } else {
       idle.style.display = 'none';
-      document.getElementById('s' + idx).classList.add('active');
+      const el  = document.getElementById('s' + idx);
+      const rdc = RDC[idx] || 'source';
+      el.classList.add('active', 'rdc-' + rdc);
+
       ctr.textContent = (idx + 1) + ' / ' + N;
-      const HALF = Math.ceil(N / 2);
-      hist.innerHTML      = makeEntries(SLIDE_DATA.slice(0, Math.min(idx, HALF)));
-      histRight.innerHTML = makeEntries(SLIDE_DATA.slice(HALF, idx));
+
+      const HIST_SPLIT = 20;
+      hist.innerHTML      = buildPanel(SLIDE_DATA.slice(0, Math.min(idx, HIST_SPLIT)), 0);
+      histRight.innerHTML = idx > HIST_SPLIT ? buildPanel(SLIDE_DATA.slice(HIST_SPLIT, idx), HIST_SPLIT) : '';
       hist.scrollTop      = hist.scrollHeight;
       histRight.scrollTop = histRight.scrollHeight;
+
+      const g = getGroupIdx(idx);
+      if (g !== curGroup) {
+        curGroup = g;
+        if (g >= 0 && idx === GROUPS[g].start) showGroupHeader(g);
+      }
     }
     cur = idx;
   }
 
   function sync() {
+    if (grpSpeaking) return;
     const t = aud.currentTime;
     let next = -1;
     for (let i = 0; i < TIMES.length; i++) if (t >= TIMES[i]) next = i;
@@ -319,8 +648,12 @@ function initApp(TIMES, SLIDE_DATA) {
   }
 
   function forceSync() {
-    document.querySelectorAll('.slide.active').forEach(el => el.classList.remove('active'));
-    cur = -1;
+    cancelGroupHeader();
+    document.querySelectorAll('.slide.active').forEach(el =>
+      el.classList.remove('active', 'rdc-rishi', 'rdc-devata', 'rdc-chhandas', 'rdc-source')
+    );
+    cur      = -1;
+    curGroup = -1;
     idle.style.display = '';
     sync();
   }
@@ -329,7 +662,32 @@ function initApp(TIMES, SLIDE_DATA) {
   aud.addEventListener('seeked',     forceSync);
   aud.addEventListener('ended',      () => show(-1));
 
-  // ── playback speed ─────────────────────────────────────────────────────────
+  // ── 2. Audio interruption detection (timer-based) ────────────────────
+  // Handles Google Maps audio and other foreground interruptions that
+  // pause audio without hiding the tab.
+  aud.addEventListener('pause', () => {
+    if (userPaused) return;
+    interruptedAt = aud.currentTime;
+    clearTimeout(_resumeTimer);
+    _resumeTimer = setTimeout(() => {
+      if (aud.paused && !userPaused && interruptedAt !== null) {
+        aud.currentTime = Math.max(0, interruptedAt - 2);
+        interruptedAt = null;
+        aud.play().catch(() => {});
+      }
+    }, 3500);
+  });
+  aud.addEventListener('play', () => { interruptedAt = null; clearTimeout(_resumeTimer); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && interruptedAt !== null && !userPaused && aud.paused) {
+      clearTimeout(_resumeTimer);
+      aud.currentTime = Math.max(0, interruptedAt - 2);
+      interruptedAt = null;
+      aud.play().catch(() => {});
+    }
+  });
+
+  // ── playback speed ─────────────────────────────────────────────────────
   let speed = 1.0;
   const MIN_SPEED = 0.25, MAX_SPEED = 3.0;
 
@@ -373,7 +731,9 @@ function initApp(TIMES, SLIDE_DATA) {
     switch (e.key) {
       case ' ':
         e.preventDefault();
-        aud.paused ? aud.play() : aud.pause();
+        cancelGroupHeader();
+        if (aud.paused) { userPaused = false; aud.play(); }
+        else            { userPaused = true;  aud.pause(); }
         break;
       case 'ArrowRight':
         e.preventDefault();
@@ -396,7 +756,7 @@ function initApp(TIMES, SLIDE_DATA) {
     }
   });
 
-  // ── custom bottom controls ────────────────────────────────────────────────────
+  // ── bottom controls ────────────────────────────────────────────────────────
   const playBtn  = document.getElementById('playBtn');
   const prog     = document.getElementById('prog');
   const timeDisp = document.getElementById('time-disp');
@@ -415,15 +775,19 @@ function initApp(TIMES, SLIDE_DATA) {
     timeDisp.textContent = fmtTime(aud.currentTime) + ' / ' + fmtTime(aud.duration);
   }
 
-  playBtn.addEventListener('click', () => aud.paused ? aud.play() : aud.pause());
+  playBtn.addEventListener('click', () => {
+    cancelGroupHeader();
+    if (aud.paused) { userPaused = false; aud.play(); }
+    else            { userPaused = true;  aud.pause(); }
+  });
   prog.addEventListener('input', () => { aud.currentTime = parseFloat(prog.value); });
-  aud.addEventListener('play',       updateBar);
-  aud.addEventListener('pause',      updateBar);
-  aud.addEventListener('ended',      updateBar);
-  aud.addEventListener('timeupdate', updateBar);
+  aud.addEventListener('play',           updateBar);
+  aud.addEventListener('pause',          updateBar);
+  aud.addEventListener('ended',          updateBar);
+  aud.addEventListener('timeupdate',     updateBar);
   aud.addEventListener('loadedmetadata', updateBar);
 
-  // ── tap zones: top third = faster, middle = play/pause, bottom = slower ──────
+  // ── tap zones: top = faster, middle = play/pause, bottom = slower ──────────
   const zoneTop = document.getElementById('zone-top');
   const zoneMid = document.getElementById('zone-mid');
   const zoneBot = document.getElementById('zone-bot');
@@ -435,7 +799,6 @@ function initApp(TIMES, SLIDE_DATA) {
   }
 
   document.getElementById('stage').addEventListener('click', function(e) {
-    // Go fullscreen when in landscape and not already fullscreen
     if (window.innerWidth > window.innerHeight && !document.fullscreenElement) {
       document.documentElement.requestFullscreen?.().catch(() => {});
     }
@@ -443,6 +806,8 @@ function initApp(TIMES, SLIDE_DATA) {
     const rect = this.getBoundingClientRect();
     const relX = (e.clientX - rect.left) / rect.width;
     const relY = (e.clientY - rect.top)  / rect.height;
+
+    cancelGroupHeader();
 
     if (relX < 0.25) {
       aud.currentTime = Math.max(0, aud.currentTime - 10);
@@ -454,7 +819,8 @@ function initApp(TIMES, SLIDE_DATA) {
       setSpeed(speed + 0.25);
       flashZone(zoneTop);
     } else if (relY < 0.667) {
-      aud.paused ? aud.play() : aud.pause();
+      if (aud.paused) { userPaused = false; aud.play(); }
+      else            { userPaused = true;  aud.pause(); }
       flashZone(zoneMid);
     } else {
       setSpeed(speed - 0.25);
