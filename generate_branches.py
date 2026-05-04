@@ -199,12 +199,18 @@ def preprocess(text: str) -> str:
 def sil(ms: int) -> AudioSegment:
     return AudioSegment.silent(duration=ms)
 
+def strip_silence(seg, silence_thresh=-42, padding_ms=40):
+    from pydub.silence import detect_leading_silence
+    start = detect_leading_silence(seg, silence_threshold=silence_thresh)
+    end   = detect_leading_silence(seg.reverse(), silence_threshold=silence_thresh)
+    return seg[max(0, start-padding_ms) : len(seg)-max(0, end-padding_ms)]
+
 def tts(text: str) -> AudioSegment:
     """gTTS (regular female voice) for slide content."""
     buf = io.BytesIO()
     gTTS(text=preprocess(text), lang="en", slow=False).write_to_fp(buf)
     buf.seek(0)
-    return AudioSegment.from_mp3(buf)
+    return strip_silence(AudioSegment.from_mp3(buf))
 
 async def _edge_async(text: str) -> AudioSegment:
     buf = io.BytesIO()
