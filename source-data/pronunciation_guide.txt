@@ -14,6 +14,9 @@
 #
 # IMPORTANT: Have a Sanskrit-trained reviewer verify before final use.
 # You can re-run generate_branches.py at any time to hear the result.
+#
+# NOTE: Longer entries are matched before shorter ones (length-sorted),
+#       so "Karma Mimamsa" is always replaced before "Karma" alone.
 
 # ──────────────────────────────────────────────────────────────────────────────
 # GROUP NAMES  (used by edge-tts for group-header narration)
@@ -28,6 +31,7 @@ Pratishakhyas   = pruh-'tee-shah-khyuz
 # THE FOUR VEDAS
 # ──────────────────────────────────────────────────────────────────────────────
 Rik Veda        = rik 'vay-duh
+Rk Veda         = rik 'vay-duh
 Sama Veda       = 'sah-muh vay-duh
 Yajur-Veda      = 'yah-jur vay-duh
 Atharva Veda    = uh-'thar-vuh vay-duh
@@ -36,20 +40,37 @@ Atharva Veda    = uh-'thar-vuh vay-duh
 # VEDANGAS  (limbs of the Veda)
 # ──────────────────────────────────────────────────────────────────────────────
 Shiksha         = 'shik-shah
+# Kalp = short form of Kalpa
 Kalpa           = 'kahl-puh
+Kalp            = kahlp
+# Vyakaran = short form of Vyakarana
 Vyakarana       = vyah-'kah-ruh-nuh
+Vyakaran        = vyah-'kah-run
+# Nirukt = short form of Nirukta
 Nirukta         = nih-'rookt-uh
+Nirukt          = nih-'rookth
 Jyotish         = 'joh-tish
+# Chhand = short form of Chhandas
 Chhandas        = 'chhuhn-dus
+Chhand          = 'chhuhn-duh
 
 # ──────────────────────────────────────────────────────────────────────────────
 # UPANGAS  (philosophical systems)
 # ──────────────────────────────────────────────────────────────────────────────
 Nyaya           = 'nyah-yuh
+# Vaisheshik = short form of Vaisheshika
 Vaisheshika     = vy-'shay-shih-kuh
+Vaisheshik      = vy-'shay-shihk
+# Samkhya = alternate spelling of Sankhya
 Sankhya         = 'sahnk-yuh
+Samkhya         = 'sahm-kyuh
+# Karma Mimansa = alternate spelling (keep before "Karma" alone)
 Karma Mimamsa   = 'kar-muh mee-'mahm-sah
+Karma Mimansa   = 'kar-muh mee-'mahm-sah
+# Vedant = short form of Vedanta
 Vedanta         = vay-'dahn-tuh
+Vedant          = vay-'dahnt
+Yoga            = 'yoh-guh
 
 # ──────────────────────────────────────────────────────────────────────────────
 # UPA-VEDAS  (auxiliary and applied Vedas)
@@ -74,6 +95,8 @@ Bhava-Prakash   = 'bhuh-vuh pruh-'kahsh
 # ──────────────────────────────────────────────────────────────────────────────
 Upanishad       = oo-'pah-nih-shud
 Aranyak         = uh-'ruhn-yuk
+# Brahmana = singular form; Brahmanas handled above
+Brahmana        = bruh-'mah-nuh
 Itihas          = ih-tih-'hahs
 Ramayan         = rah-'mah-yun
 Mahabharat      = mah-'hah-bah-rut
@@ -95,10 +118,12 @@ Shukl           = shookl
 Krishn          = krish-nuh
 
 # ──────────────────────────────────────────────────────────────────────────────
-# COLUMN HEADER WORDS spoken in audio
+# JYOTISH TERMS  (appear in Aspect of Physiology column for Jyotish slide)
 # ──────────────────────────────────────────────────────────────────────────────
-# Column C header: "Aspect of Physiology" — spoken clearly already by gTTS
-# Column D header: "Medical Definition"   — spoken clearly already by gTTS
+Nakshatras      = nuhk-'shah-trus
+Nakshatr        = nuhk-'shah-tur
+Grahas          = 'grah-huz
+Rashis          = 'rah-sheez
 
 # ──────────────────────────────────────────────────────────────────────────────
 # COMMON COMPONENT WORDS  (appear inside longer phrases)

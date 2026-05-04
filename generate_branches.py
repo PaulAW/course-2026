@@ -5,16 +5,15 @@ Generate 40-branches.mp3 and 40-branches.html from source-data/40-Branches_Chart
 Audio structure
 ───────────────
 Before the first slide of each group:
-  1 s silence → low gong (220 Hz, long fade) → 400 ms silence
+  1 s silence → low gong (220 Hz, long fade) → 300 ms silence
   → [edge-tts male voice] group name → 300 ms
-  → [edge-tts male voice] group description → 700 ms
   → for each member in the group:
-       [edge-tts] Vedic Name → 500 ms → Quality → 500 ms → Aspect → 800 ms
+       [edge-tts] Vedic Name → 500 ms → Quality → 800 ms
   → 1.5 s silence
 
-Per slide (unchanged):
-  4 s silence → 880 Hz bell → "Column: Value" spoken for each non-empty cell
-  → brief pause → Vedic Name repeated once
+Per slide:
+  4 s silence → 880 Hz bell → 300 ms → "Column: Value" spoken for each non-empty cell
+  → brief pause → Vedic Name + Quality repeated once
 
 HTML slideshow stays in sync via JavaScript timeupdate.
 Group-header overlay is driven purely by GROUP_HEADER_RANGES timestamps
@@ -51,7 +50,7 @@ for _pkg, _mod in [
 # ── check ffmpeg ───────────────────────────────────────────────────────────────
 if not shutil.which("ffmpeg"):
     sys.exit(
-        "\nERROR: ffmpeg not found on PATH — required for MP3 export.\n"
+        "\nERROR: ffmpeg not found on PATH -- required for MP3 export.\n"
         "  Windows : winget install --id Gyan.FFmpeg\n"
         "  macOS   : brew install ffmpeg\n"
         "  Ubuntu  : sudo apt install ffmpeg\n"
@@ -77,20 +76,20 @@ SILENCE_PRE_MS      = 4_000   # silence before each slide
 BELL_HZ             = 880
 BELL_DUR_MS         = 2_000
 BELL_FADE_MS        = 1_800
+BELL_POST_MS        = 300     # brief gap after bell before first spoken cell
 
 GONG_HZ             = 220     # lower frequency distinguishes group headers
 GONG_DUR_MS         = 3_000
 GONG_FADE_MS        = 2_600
 
 GAP_CELLS_MS        = 350     # between spoken cells within a slide row
-GAP_REPEAT_MS       = 600     # before Vedic Name repeat at end of row
+GAP_REPEAT_MS       = 600     # before Vedic Name+Quality repeat at end of row
 
 # pauses within group-header narration
 GAP_GRP_INTRO_MS    = 300     # after gong, before group name
 GAP_AFTER_NAME_MS   = 300     # after group name
-GAP_AFTER_DESC_MS   = 700     # after group description, before member list
-GAP_WITHIN_MBMR_MS  = 500     # between name / quality / aspect of each member
-GAP_BETWEEN_MBMR_MS = 800     # after aspect, before next member
+GAP_WITHIN_MBMR_MS  = 500     # between name and quality of each member
+GAP_BETWEEN_MBMR_MS = 800     # after quality, before next member
 GAP_GRP_OUTRO_MS    = 1_500   # trailing silence after all members spoken
 
 # ── group definitions ─────────────────────────────────────────────────────────
@@ -152,11 +151,48 @@ def _load_pronunciations() -> dict[str, str]:
 PRONUNCIATIONS = _load_pronunciations()
 _PRON_KEYS = sorted(PRONUNCIATIONS.keys(), key=len, reverse=True)
 
+def roman_to_words(text: str) -> str:
+    """Convert Roman numerals (I-XVIII) to spoken words in anatomical context."""
+    _rom = {
+        'XVIII':18,'XVII':17,'XVI':16,'XV':15,'XIV':14,'XIII':13,
+        'XII':12,'XI':11,'X':10,'IX':9,'VIII':8,'VII':7,'VI':6,
+        'V':5,'IV':4,'III':3,'II':2,'I':1,
+    }
+    _w = {1:'one',2:'two',3:'three',4:'four',5:'five',6:'six',
+          7:'seven',8:'eight',9:'nine',10:'ten',11:'eleven',12:'twelve',
+          13:'thirteen',14:'fourteen',15:'fifteen',16:'sixteen',
+          17:'seventeen',18:'eighteen'}
+    rpat = '|'.join(sorted(_rom, key=len, reverse=True))
+    def r2w(s): return _w.get(_rom.get(s.upper(), 0), s)
+
+    # context-sensitive: "Laminae I-VI", "Layer V", "Cortical Layer III", etc.
+    ctx = r'(?:(?:Cortical\s+)?[Ll]ayer|[Ll]amina[e]?|Rexed)'
+    # ranges first (longer match wins over single)
+    text = re.sub(
+        r'(' + ctx + r')\s+(' + rpat + r')-(' + rpat + r')',
+        lambda m: m.group(1) + ' ' + r2w(m.group(2)) + ' through ' + r2w(m.group(3)),
+        text
+    )
+    # single with context
+    text = re.sub(
+        r'(' + ctx + r')\s+(' + rpat + r')(?!\w)',
+        lambda m: m.group(1) + ' ' + r2w(m.group(2)),
+        text
+    )
+    # parenthetical ranges: (I-VI)
+    text = re.sub(
+        r'\((' + rpat + r')-(' + rpat + r')\)',
+        lambda m: '(' + r2w(m.group(1)) + ' through ' + r2w(m.group(2)) + ')',
+        text
+    )
+    return text
+
 def preprocess(text: str) -> str:
-    """Apply pronunciation substitutions then fix word-number hyphens."""
+    """Convert Roman numerals, apply pronunciation substitutions, fix word-number hyphens."""
+    text = roman_to_words(text)
     for word in _PRON_KEYS:
         text = text.replace(word, PRONUNCIATIONS[word])
-    text = re.sub(r"(\w)-(\d)", r"\1, \2", text)   # "Shrauta-20" → "Shrauta, 20"
+    text = re.sub(r"(\w)-(\d)", r"\1, \2", text)   # "Shrauta-20" >> "Shrauta, 20"
     return text
 
 # ── audio helpers ─────────────────────────────────────────────────────────────
@@ -179,7 +215,7 @@ async def _edge_async(text: str) -> AudioSegment:
     return AudioSegment.from_mp3(buf)
 
 def tts_group(text: str) -> AudioSegment:
-    """edge-tts male voice — used only for group-header narration."""
+    """edge-tts male voice -- used only for group-header narration."""
     return asyncio.run(_edge_async(text))
 
 def esc(s: str) -> str:
@@ -226,14 +262,11 @@ def build_group_header(gi: int) -> AudioSegment:
     audio += sil(GAP_GRP_INTRO_MS)
     audio += tts_group(g["name"])
     audio += sil(GAP_AFTER_NAME_MS)
-    audio += tts_group(g["desc"])
-    audio += sil(GAP_AFTER_DESC_MS)
 
     for mi in display_idx:
         row     = entries[mi]
         name    = row[0] if len(row) > 0 else ""
         quality = row[1] if len(row) > 1 else ""
-        aspect  = row[2] if len(row) > 2 else ""
         note    = notes.get(mi, "")
 
         spoken_name = name + (f", {note}" if note else "")
@@ -242,9 +275,6 @@ def build_group_header(gi: int) -> AudioSegment:
             audio += sil(GAP_WITHIN_MBMR_MS)
         if quality:
             audio += tts_group(quality)
-            audio += sil(GAP_WITHIN_MBMR_MS)
-        if aspect:
-            audio += tts_group(aspect)
             audio += sil(GAP_BETWEEN_MBMR_MS)
 
     audio += sil(GAP_GRP_OUTRO_MS)
@@ -256,7 +286,8 @@ slide_times_s: list[float]                     = []
 group_header_ranges: list[tuple[float,float,int]] = []
 
 for idx, row in enumerate(entries):
-    vedic = row[0] if row else ""
+    vedic   = row[0] if row else ""
+    quality = row[1] if len(row) > 1 else ""
 
     # ── group header before first slide of each group ─────────────────────
     if idx in GROUP_START_MAP:
@@ -272,6 +303,7 @@ for idx, row in enumerate(entries):
     track += sil(SILENCE_PRE_MS)
     slide_times_s.append(len(track) / 1000.0)
     track += BELL
+    track += sil(BELL_POST_MS)   # brief gap after bell before first spoken cell
 
     first_cell = True
     for col_name, val in zip(headers, row):
@@ -282,9 +314,11 @@ for idx, row in enumerate(entries):
         track += tts(f"{col_name}: {val}")
         first_cell = False
 
+    # repeat Vedic Name + Quality at end of each slide
     if vedic:
         track += sil(GAP_REPEAT_MS)
-        track += tts(vedic)
+        repeat_text = f"{vedic}. {quality}." if quality else vedic
+        track += tts(repeat_text)
 
 dur_s      = len(track) / 1000.0
 mins, secs = divmod(dur_s, 60)
@@ -358,7 +392,7 @@ html, body {{
   position: relative;
 }}
 
-/* ── history panel ── */
+/* ── history panels ── */
 #history {{
   position: absolute;
   top: 10px; left: 12px;
@@ -370,6 +404,17 @@ html, body {{
   text-align: left;
 }}
 #history::-webkit-scrollbar {{ display: none; }}
+#history-right {{
+  position: absolute;
+  top: 10px; right: 12px;
+  max-width: 200px;
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  pointer-events: none;
+  text-align: left;
+}}
+#history-right::-webkit-scrollbar {{ display: none; }}
 .h-entry {{ margin-bottom: 5px; }}
 .h-name  {{ font-size: .82rem; color: #5a7090; line-height: 1.3; }}
 .h-qual  {{ font-size: .74rem; color: #3d5268; font-style: italic; line-height: 1.3; padding-left: 5px; }}
@@ -411,7 +456,6 @@ html, body {{
 }}
 #grp-hdr.show {{ opacity: 1; }}
 .grp-name {{ font-size: clamp(1.5rem,4.5vw,2.6rem); color: #f5e6c8; letter-spacing: .12em; text-transform: uppercase; }}
-.grp-desc {{ font-size: clamp(.75rem,2vw,1rem); color: #5a7090; font-style: italic; }}
 .grp-sep  {{ width: 50%; border: none; border-top: 1px solid #1e2a3a; margin: 2px 0; }}
 .grp-members {{ display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 820px; padding: 0 20px; }}
 .grp-row  {{ display: flex; gap: 8px; justify-content: center; }}
@@ -423,6 +467,7 @@ html, body {{
 .grp-item.devata   {{ color:#d478a0; border-color:#60243a; background:rgba(212,120,160,.07); }}
 .grp-item.chhandas {{ color:#c8a84b; border-color:#604820; background:rgba(200,168,75,.07);  }}
 .grp-item.source   {{ color:#f5e6c8; border-color:#3a4760; background:rgba(245,230,200,.07); }}
+.grp-item-quality  {{ display:block; font-size:.85em; opacity:.72; font-style:italic; margin-top:2px; }}
 .grp-note {{ display:block; font-size:.75em; opacity:.65; margin-top:3px; font-style:italic; }}
 
 /* ── audio bar ── */
@@ -452,7 +497,7 @@ html, body {{
 #zone-top {{ top:0; height:33.33%; }}
 #zone-mid {{ top:33.33%; height:33.34%; }}
 #zone-bot {{ top:66.67%; height:33.33%; }}
-@media (max-width:600px) {{ #history {{ display:none; }} }}
+@media (max-width:600px) {{ #history, #history-right {{ display:none; }} }}
 </style>
 </head>
 <body>
@@ -472,9 +517,9 @@ html, body {{
   <div id="stage">
     <div id="idle">&#9654;&#xfe0e; Tap centre to play</div>
     <div id="history"></div>
+    <div id="history-right"></div>
     <div id="grp-hdr">
       <div class="grp-name"></div>
-      <div class="grp-desc"></div>
       <hr class="grp-sep">
       <div class="grp-members"></div>
     </div>
@@ -536,13 +581,14 @@ document.getElementById('pwd').addEventListener('keydown', e => {{ if (e.key==='
 document.getElementById('enterBtn').addEventListener('click', checkPwd);
 
 // ── core elements ─────────────────────────────────────────────────────────────
-const aud     = document.getElementById('aud');
-const idle    = document.getElementById('idle');
-const ctr     = document.getElementById('ctr');
-const hist    = document.getElementById('history');
-const grpHdr  = document.getElementById('grp-hdr');
-let cur       = -1;
-let curGrp    = -1;
+const aud      = document.getElementById('aud');
+const idle     = document.getElementById('idle');
+const ctr      = document.getElementById('ctr');
+const hist     = document.getElementById('history');
+const histRight= document.getElementById('history-right');
+const grpHdr   = document.getElementById('grp-hdr');
+let cur        = -1;
+let curGrp     = -1;
 
 // ── history panel ─────────────────────────────────────────────────────────────
 function getGroupIdx(idx) {{
@@ -567,7 +613,7 @@ function makeEntries(arr, startIdx) {{
   return html;
 }}
 
-// ── group header overlay (visual only — audio is in the MP3) ─────────────────
+// ── group header overlay (visual only -- audio is in the MP3) ─────────────────
 function showGroupHeaderVisual(gi) {{
   if (gi === curGrp) return;
   curGrp = gi;
@@ -575,13 +621,18 @@ function showGroupHeaderVisual(gi) {{
   const rdcOrder = {{ source:0, rishi:1, devata:2, chhandas:3 }};
   const dispIdx  = g.display || (()=>{{ const a=[];for(let i=g.start;i<=g.end;i++)a.push(i);return a;}})();
   const notes    = g.notes || {{}};
-  const members  = dispIdx.map(i => ({{ idx:i, name:SLIDE_DATA[i]?SLIDE_DATA[i][0]:'', rdc:RDC[i]||'source' }}));
+  const members  = dispIdx.map(i => ({{
+    idx:     i,
+    name:    SLIDE_DATA[i]?SLIDE_DATA[i][0]:'',
+    quality: SLIDE_DATA[i]?SLIDE_DATA[i][1]:'',
+    rdc:     RDC[i]||'source'
+  }}));
   const rows=[]; for(let i=0;i<members.length;i+=3) rows.push(members.slice(i,i+3).sort((a,b)=>rdcOrder[a.rdc]-rdcOrder[b.rdc]));
   grpHdr.querySelector('.grp-name').textContent = g.name;
-  grpHdr.querySelector('.grp-desc').textContent = g.desc;
   grpHdr.querySelector('.grp-members').innerHTML = rows.map(row =>
     '<div class="grp-row">' + row.map(m =>
       '<div class="grp-item ' + m.rdc + '">' + m.name +
+      (m.quality ? '<span class="grp-item-quality">' + m.quality + '</span>' : '') +
       (notes[m.idx] ? '<span class="grp-note">' + notes[m.idx] + '</span>' : '') +
       '</div>'
     ).join('') + '</div>'
@@ -602,15 +653,18 @@ function show(idx) {{
     if (prev) prev.classList.remove('active','rdc-rishi','rdc-devata','rdc-chhandas','rdc-source');
   }}
   if (idx < 0) {{
-    idle.style.display=''; ctr.textContent=''; hist.innerHTML='';
+    idle.style.display=''; ctr.textContent='';
+    hist.innerHTML=''; histRight.innerHTML='';
   }} else {{
     idle.style.display='none';
     const el  = document.getElementById('s'+idx);
     const rdc = RDC[idx]||'source';
     if (el) el.classList.add('active','rdc-'+rdc);
-    ctr.textContent = (idx+1)+' / '+N;
-    hist.innerHTML  = makeEntries(SLIDE_DATA.slice(0, idx), 0);
-    hist.scrollTop  = hist.scrollHeight;
+    ctr.textContent      = (idx+1)+' / '+N;
+    hist.innerHTML       = makeEntries(SLIDE_DATA.slice(0, Math.min(idx, 20)), 0);
+    hist.scrollTop       = hist.scrollHeight;
+    histRight.innerHTML  = idx > 20 ? makeEntries(SLIDE_DATA.slice(20, idx), 20) : '';
+    histRight.scrollTop  = histRight.scrollHeight;
   }}
   cur = idx;
 }}
@@ -662,18 +716,27 @@ document.addEventListener('visibilitychange', () => {{
   if (document.visibilityState === 'visible' && !aud.paused) acquireWakeLock();
 }});
 
-// ── audio interruption detection ──────────────────────────────────────────────
-let userPaused   = false;
-let intPause     = false;   // true when our code pauses (not user, not Maps)
+// ── audio interruption detection (timer-based for Google Maps etc.) ───────────
+let userPaused    = false;
 let interruptedAt = null;
+let _resumeTimer  = null;
 
 aud.addEventListener('pause', () => {{
-  if (intPause) {{ intPause = false; return; }}
-  if (!userPaused) interruptedAt = aud.currentTime;
+  if (userPaused) return;           // user-initiated pause -- ignore
+  interruptedAt = aud.currentTime;
+  clearTimeout(_resumeTimer);
+  _resumeTimer = setTimeout(() => {{
+    if (aud.paused && !userPaused && interruptedAt !== null) {{
+      aud.currentTime = Math.max(0, interruptedAt - 2);
+      interruptedAt = null;
+      aud.play().catch(()=>{{}});
+    }}
+  }}, 3500);
 }});
-aud.addEventListener('play',  () => {{ interruptedAt = null; }});
+aud.addEventListener('play', () => {{ interruptedAt = null; clearTimeout(_resumeTimer); }});
 document.addEventListener('visibilitychange', () => {{
-  if (document.visibilityState === 'visible' && interruptedAt !== null && !userPaused) {{
+  if (document.visibilityState === 'visible' && interruptedAt !== null && !userPaused && aud.paused) {{
+    clearTimeout(_resumeTimer);
     aud.currentTime = Math.max(0, interruptedAt - 2);
     interruptedAt = null;
     aud.play().catch(()=>{{}});
@@ -692,7 +755,7 @@ const MIN_SPEED = 0.25, MAX_SPEED = 3.0;
 function setSpeed(s) {{
   speed = Math.min(MAX_SPEED, Math.max(MIN_SPEED, Math.round(s*100)/100));
   aud.playbackRate = speed;
-  showBadge(speed.toFixed(2).replace(/\\.?0+$/,'')+'×');
+  showBadge(speed.toFixed(2).replace(/\\.?0+$/,'')+'x');
 }}
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
@@ -711,7 +774,7 @@ function showBadge(text) {{
 }}
 function showSeekFlash(side) {{
   const el=document.createElement('div');
-  el.textContent=side==='left'?'◀ 10s':'30s ▶';
+  el.textContent=side==='left'?'< 10s':'30s >';
   el.style.cssText='position:fixed;top:50%;'+(side==='left'?'left:12%':'right:12%')+';transform:translateY(-50%);'
     +'background:rgba(0,0,0,.65);color:#f5e6c8;font-size:1.3rem;padding:10px 22px;'
     +'border-radius:36px;pointer-events:none;opacity:1;transition:opacity .5s;z-index:600;font-family:Georgia,serif;';
